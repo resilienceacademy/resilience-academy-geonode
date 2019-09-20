@@ -86,7 +86,8 @@ local-geonode >> {override_fn}".format(**envs), pty=True)
 {gs_admin_pwd} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export SITEURL=\
 {siteurl} >> {override_fn}".format(**envs), pty=True)
-    ctx.run('echo export ALLOWED_HOSTS="\\"{}\\"" >> {}'.format(allowed_hosts, override_env), pty=True)
+    ctx.run('echo export ALLOWED_HOSTS="\\"{}\\"" >> {override_fn}'.format(
+        allowed_hosts, **envs), pty=True)
     if not os.environ.get('DATABASE_URL'):
         ctx.run("echo export DATABASE_URL=\
 {dburl} >> {override_fn}".format(**envs), pty=True)
@@ -189,7 +190,7 @@ def updategeoip(ctx):
 def updateadmin(ctx):
     print "***********************update admin details**************************"
     ctx.run("rm -rf /tmp/django_admin_docker.json", pty=True)
-    _prepare_admin_fixture(os.environ.get('ADMIN_PASSWORD', None), os.environ.get('ADMIN_EMAIL', None))
+    _prepare_admin_fixture(os.environ.get('ADMIN_PASSWORD', 'admin'), os.environ.get('ADMIN_EMAIL', 'admin@example.org'))
     ctx.run("django-admin.py loaddata /tmp/django_admin_docker.json \
 --settings={0}".format(_localsettings()), pty=True)
 
@@ -263,6 +264,22 @@ def _update_geodb_connstring():
 def _localsettings():
     settings = os.getenv('DJANGO_SETTINGS_MODULE', 'resilienceacademy.settings')
     return settings
+
+
+def _rest_api_availability(url):
+    import requests
+    try:
+        r = requests.request('get', url, verify=False)
+        r.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xxx
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        print "GeoServer connection error is {0}".format(e)
+        return False
+    except requests.exceptions.HTTPError as er:
+        print "GeoServer HTTP error is {0}".format(er)
+        return False
+    else:
+        print "GeoServer API are available!"
+        return True
 
 
 def _geonode_public_host_ip():
