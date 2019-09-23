@@ -404,7 +404,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "localhost-hostgeoserver",
-                "url": "{0}://{1}/geoserver/".format(net_scheme, net_loc),
+                "url": "{}".format(os.environ['GEOSERVER_LOCATION']),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -418,7 +418,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "default-geoserver",
-                "url": "{0}://{1}/geoserver/".format(net_scheme, net_loc),
+                "url": "{}".format(os.environ['GEOSERVER_LOCATION']),
                 "notes": "",
                 "last_check": d,
                 "active": True,
