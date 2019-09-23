@@ -59,10 +59,16 @@ def update(ctx):
         "geonode_docker_host": "{0}".format(socket.gethostbyname('geonode')),
         "public_fqdn": "{0}:{1}".format(pub_ip, pub_port),
         "public_host": "{0}".format(pub_ip),
-        "dburl": db_url,
-        "geodburl": geodb_url,
-        "monitoring": os.environ.get('MONITORING_ENABLED', False),
+        "dburl": os.environ.get('DATABASE_URL', db_url),
+        "geodburl": os.environ.get('GEODATABASE_URL', geodb_url),
+        "static_root": os.environ.get('STATIC_ROOT', '/mnt/volumes/statics/static/'),
+        "media_root": os.environ.get('MEDIA_ROOT', '/mnt/volumes/statics/uploaded/'),
+        "geoip_path": os.environ.get('GEOIP_PATH', '/mnt/volumes/statics/geoip.db'),
+        "monitoring": os.environ.get('MONITORING_ENABLED', True),
         "monitoring_data_ttl": os.environ.get('MONITORING_DATA_TTL', 7),
+        "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://geoserver:8080/geoserver/'),
+        "gs_web_ui_loc": os.environ.get('GEOSERVER_WEB_UI_LOCATION',
+                                        'http://{0}:{1}/geoserver/'.format(pub_ip, pub_port) if pub_port else 'http://{0}/geoserver/'.format(pub_ip)),
         "gs_pub_loc": os.environ.get('GEOSERVER_PUBLIC_LOCATION',
                                      'http://{0}:{1}/geoserver/'.format(pub_ip, pub_port) if pub_port else 'http://{0}/geoserver/'.format(pub_ip)),
         "gs_admin_pwd": os.environ.get('GEOSERVER_ADMIN_PASSWORD', 'geoserver'),
@@ -86,20 +92,28 @@ def update(ctx):
 local-geonode >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export MONITORING_DATA_TTL=\
 {monitoring_data_ttl} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEOSERVER_LOCATION=\
+{gs_loc} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEOSERVER_WEB_UI_LOCATION=\
+{gs_web_ui_loc} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export GEOSERVER_PUBLIC_LOCATION=\
 {gs_pub_loc} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export GEOSERVER_ADMIN_PASSWORD=\
 {gs_admin_pwd} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export SITEURL=\
 {siteurl} >> {override_fn}".format(**envs), pty=True)
-    ctx.run('echo export ALLOWED_HOSTS="\\"{}\\"" >> {override_fn}'.format(
-        allowed_hosts, **envs), pty=True)
-    if not os.environ.get('DATABASE_URL'):
-        ctx.run("echo export DATABASE_URL=\
+    ctx.run('echo export ALLOWED_HOSTS=\
+"\\"{}\\"" >> {override_fn}'.format(allowed_hosts, **envs), pty=True)
+    ctx.run("echo export DATABASE_URL=\
 {dburl} >> {override_fn}".format(**envs), pty=True)
-    if not os.environ.get('GEODATABASE_URL'):
-        ctx.run("echo export GEODATABASE_URL=\
+    ctx.run("echo export GEODATABASE_URL=\
 {geodburl} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export STATIC_ROOT=\
+{static_root} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export MEDIA_ROOT=\
+{media_root} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEOIP_PATH=\
+{geoip_path} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGIN_URL=\
 {siteurl}account/login/ >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGOUT_URL=\
