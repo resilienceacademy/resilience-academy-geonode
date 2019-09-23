@@ -356,6 +356,7 @@ Y9HKeIQPcy5Cp08KQNpRHQbjpLItDHv12GvkSeXp6OxaUETv3",
 def _prepare_monitoring_fixture():
     upurl = urlparse(os.environ['SITEURL'])
     net_scheme = upurl.scheme
+    net_loc = upurl.netloc
     pub_ip = _geonode_public_host_ip()
     print "Public Hostname or IP is {0}".format(pub_ip)
     pub_port = _geonode_public_port()
@@ -375,7 +376,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "local-geonode",
-                "url": "{0}://{1}/".format(net_scheme, os.environ['MONITORING_HOST_NAME']),
+                "url": "{0}://{1}/".format(net_scheme, net_loc),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -389,7 +390,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "localhost-hostgeonode",
-                "url": "{0}://{1}/".format(net_scheme, os.environ['MONITORING_HOST_NAME']),
+                "url": "{0}://{1}/".format(net_scheme, net_loc),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -403,7 +404,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "localhost-hostgeoserver",
-                "url": "{0}://{1}/geoserver/".format(net_scheme, os.environ['MONITORING_HOST_NAME']),
+                "url": "{0}://{1}/geoserver/".format(net_scheme, net_loc),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -417,7 +418,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "default-geoserver",
-                "url": "{0}://{1}/geoserver/".format(net_scheme, os.environ['MONITORING_HOST_NAME']),
+                "url": "{0}://{1}/geoserver/".format(net_scheme, net_loc),
                 "notes": "",
                 "last_check": d,
                 "active": True,
