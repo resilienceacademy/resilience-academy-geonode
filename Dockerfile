@@ -6,6 +6,7 @@ RUN mkdir -p /usr/src/resilienceacademy
 # This section is borrowed from the official Django image but adds GDAL and others
 RUN apt-get update && apt-get install -y \
 		gcc \
+                zip \
 		gettext \
 		postgresql-client libpq-dev \
 		sqlite3 \

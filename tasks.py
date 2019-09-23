@@ -30,7 +30,7 @@ def waitforgeoserver(ctx):
 
 @task
 def update(ctx):
-    print "***************************initial*********************************"
+    print "***************************setting env*********************************"
     ctx.run("env", pty=True)
     pub_ip = _geonode_public_host_ip()
     print "Public Hostname or IP is {0}".format(pub_ip)
@@ -46,6 +46,12 @@ def update(ctx):
         except BaseException:
             time.sleep(10)
 
+    override_env = "$HOME/.override_env"
+    if os.path.exists(override_env):
+        os.remove(override_env)
+    else:
+        print("Can not delete the %s file as it doesn't exists" % override_env)
+
     envs = {
         "local_settings": "{0}".format(_localsettings()),
         "siteurl": os.environ.get('SITEURL',
@@ -60,7 +66,7 @@ def update(ctx):
         "gs_pub_loc": os.environ.get('GEOSERVER_PUBLIC_LOCATION',
                                      'http://{0}:{1}/geoserver/'.format(pub_ip, pub_port) if pub_port else 'http://{0}/geoserver/'.format(pub_ip)),
         "gs_admin_pwd": os.environ.get('GEOSERVER_ADMIN_PASSWORD', 'geoserver'),
-        "override_fn": "$HOME/.override_env"
+        "override_fn": override_env
     }
     try:
         current_allowed = ast.literal_eval(os.getenv('ALLOWED_HOSTS') or \
@@ -102,9 +108,8 @@ local-geonode >> {override_fn}".format(**envs), pty=True)
 {siteurl} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGOUT_REDIRECT_URL=\
 {siteurl} >> {override_fn}".format(**envs), pty=True)
-
-    ctx.run("source $HOME/.override_env", pty=True)
-    print "****************************final**********************************"
+    ctx.run("source %s" % override_env, pty=True)
+    print "****************************finalize env**********************************"
     ctx.run("env", pty=True)
 
 
