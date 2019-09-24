@@ -42,9 +42,10 @@ else
 
     else
 
+        /usr/local/bin/invoke prepare >> /usr/src/resilienceacademy/invoke.log
+        echo "prepare task done"
+
         if [ ${FORCE_REINIT} = "true" ]  || [ ${FORCE_REINIT} = "True" ] || [ ! -e "/mnt/volumes/statics/geonode_init.lock" ]; then
-            /usr/local/bin/invoke prepare >> /usr/src/resilienceacademy/invoke.log
-            echo "prepare task done"
             /usr/local/bin/invoke fixtures >> /usr/src/resilienceacademy/invoke.log
             echo "fixture task done"
             /usr/local/bin/invoke initialized >> /usr/src/resilienceacademy/invoke.log
@@ -64,7 +65,6 @@ else
         echo "monitoringfixture task done"
         /usr/local/bin/invoke updateadmin >> /usr/src/resilienceacademy/invoke.log
         echo "updateadmin task done"
-
 
         cmd=$UWSGI_CMD
         echo "Executing UWSGI server $cmd for Production"
