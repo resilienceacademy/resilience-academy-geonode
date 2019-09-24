@@ -162,6 +162,20 @@ def prepare(ctx):
     print "**********************prepare fixture***************************"
     ctx.run("rm -rf /tmp/default_oauth_apps_docker.json", pty=True)
     _prepare_oauth_fixture()
+    ctx.run("rm -rf /tmp/default_site.json", pty=True)
+    _prepare_site_fixture()
+    # Updating OAuth2 Service Config
+    oauth_config = "/geoserver_data/data/security/filter/geonode-oauth2/config.xml"
+    ctx.run(
+        'sed - i "s|<cliendId>.*</cliendId>|<cliendId>{client_id}</cliendId>|g" {oauth_config}'.format(
+            client_id=os.environ['OAUTH2_CLIENT_ID'],
+            oauth_config=oauth_config
+        ), pty=True)
+    ctx.run(
+        'sed - i "s|<clientSecret>.*</clientSecret>|<clientSecret>{client_secret}</clientSecret>|g" {oauth_config}'.format(
+            client_secret=os.environ['OAUTH2_CLIENT_SECRET'],
+            oauth_config=oauth_config
+        ), pty=True)
 
 
 @task
@@ -171,9 +185,13 @@ def fixtures(ctx):
 --settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py loaddata /tmp/default_oauth_apps_docker.json \
 --settings={0}".format(_localsettings()), pty=True)
+    ctx.run("python manage.py loaddata /tmp/default_site.json \
+--settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py loaddata /usr/src/resilienceacademy/fixtures/initial_data.json \
 --settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py set_all_layers_alternate \
+--settings={0}".format(_localsettings()), pty=True)
+    ctx.run("python manage.py set_all_layers_metadata -d \
 --settings={0}".format(_localsettings()), pty=True)
 
 @task
@@ -313,11 +331,34 @@ def _geonode_public_port():
     if not gn_pub_port:
         gn_pub_port = _container_exposed_port(
             'nginx',
-            os.getenv('GEONODE_INSTANCE_NAME', 'starterkit')
+            os.getenv('GEONODE_INSTANCE_NAME', 'geonode')
         )
     elif gn_pub_port in ('80', '443'):
         gn_pub_port = None
     return gn_pub_port
+
+
+def _geoserver_info_provision(url):
+    from django.conf import settings
+    from geoserver.catalog import Catalog
+    cat = Catalog(url,
+        username=settings.OGC_SERVER_DEFAULT_USER,
+        password=settings.OGC_SERVER_DEFAULT_PASSWORD
+    )
+    headers = {
+        "Content-type": "application/xml",
+        "Accept": "application/xml"
+    }
+    data = """<?xml version="1.0" encoding="UTF-8"?>
+<userPassword>
+    <newPassword>{0}</newPassword>
+</userPassword>""".format(os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver'))
+
+    response = cat.http_request(cat.service_url + '/security/self/password', method="PUT", data=data, headers=headers)
+    if response.status_code == 200:
+        print "GeoServer admin password updated SUCCESSFULLY!"
+    else:
+        print "WARNING: GeoServer admin password *NOT* updated: code [%s]" % response.status_code
 
 
 def _prepare_oauth_fixture():
@@ -350,6 +391,23 @@ def _prepare_oauth_fixture():
     ]
     with open('/tmp/default_oauth_apps_docker.json', 'w') as fixturefile:
         json.dump(default_fixture, fixturefile)
+
+
+def _prepare_site_fixture():
+    upurl = urlparse(os.environ['SITEURL'])
+    default_fixture = [
+        {
+            "model": "sites.site",
+            "pk": 1,
+            "fields": {
+                "domain": "{0}".format(upurl.hostname),
+                "name": "{0}".format(upurl.hostname)
+            }
+        }
+    ]
+    with open('/tmp/default_site.json', 'w') as fixturefile:
+        json.dump(default_fixture, fixturefile)
+
 
 def _prepare_monitoring_fixture():
     upurl = urlparse(os.environ['SITEURL'])
@@ -433,11 +491,6 @@ def _prepare_monitoring_fixture():
 
 
 def _prepare_admin_fixture(admin_password, admin_email):
-    # from django.contrib.auth import get_user_model
-    # admin = get_user_model().objects.get(username="admin")
-    # admin.set_password(admin_password)
-    # admin.email = admin_email
-    # admin.save()
     from django.contrib.auth.hashers import make_password
     d = datetime.datetime.now()
     mdext_date = d.isoformat()[:23] + "Z"
