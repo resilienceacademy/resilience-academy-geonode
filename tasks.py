@@ -167,12 +167,12 @@ def prepare(ctx):
     # Updating OAuth2 Service Config
     oauth_config = "/geoserver_data/data/security/filter/geonode-oauth2/config.xml"
     ctx.run(
-        'sed - i "s|<cliendId>.*</cliendId>|<cliendId>{client_id}</cliendId>|g" {oauth_config}'.format(
+        'sed -i "s|<cliendId>.*</cliendId>|<cliendId>{client_id}</cliendId>|g" {oauth_config}'.format(
             client_id=os.environ['OAUTH2_CLIENT_ID'],
             oauth_config=oauth_config
         ), pty=True)
     ctx.run(
-        'sed - i "s|<clientSecret>.*</clientSecret>|<clientSecret>{client_secret}</clientSecret>|g" {oauth_config}'.format(
+        'sed -i "s|<clientSecret>.*</clientSecret>|<clientSecret>{client_secret}</clientSecret>|g" {oauth_config}'.format(
             client_secret=os.environ['OAUTH2_CLIENT_SECRET'],
             oauth_config=oauth_config
         ), pty=True)
@@ -341,6 +341,7 @@ def _geonode_public_port():
 def _geoserver_info_provision(url):
     from django.conf import settings
     from geoserver.catalog import Catalog
+    print "Setting GeoServer Admin Password..."
     cat = Catalog(url,
         username=settings.OGC_SERVER_DEFAULT_USER,
         password=settings.OGC_SERVER_DEFAULT_PASSWORD
@@ -354,7 +355,9 @@ def _geoserver_info_provision(url):
     <newPassword>{0}</newPassword>
 </userPassword>""".format(os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver'))
 
+    print data
     response = cat.http_request(cat.service_url + '/security/self/password', method="PUT", data=data, headers=headers)
+    print "Response Code: %s" % response.status_code
     if response.status_code == 200:
         print "GeoServer admin password updated SUCCESSFULLY!"
     else:

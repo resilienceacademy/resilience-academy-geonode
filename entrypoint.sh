@@ -47,22 +47,24 @@ else
             echo "prepare task done"
             /usr/local/bin/invoke fixtures >> /usr/src/resilienceacademy/invoke.log
             echo "fixture task done"
-            echo "refresh static data"
-            /usr/local/bin/invoke statics >> /usr/src/resilienceacademy/invoke.log
-            echo "static data refreshed"
-            /usr/local/bin/invoke updategeoip >> /usr/src/resilienceacademy/invoke.log
-            echo "updategeoip task done"
-            /usr/local/bin/invoke waitforgeoserver >> /usr/src/resilienceacademy/invoke.log
-            echo "waitforgeoserver task done"
-            /usr/local/bin/invoke geoserverfixture >> /usr/src/app/invoke.log
-            echo "geoserverfixture task done"
-            /usr/local/bin/invoke monitoringfixture >> /usr/src/resilienceacademy/invoke.log
-            echo "monitoringfixture task done"
-            /usr/local/bin/invoke updateadmin >> /usr/src/resilienceacademy/invoke.log
-            echo "updateadmin task done"
             /usr/local/bin/invoke initialized >> /usr/src/resilienceacademy/invoke.log
             echo "initialized"
         fi
+
+        echo "refresh static data"
+        /usr/local/bin/invoke statics >> /usr/src/resilienceacademy/invoke.log
+        echo "static data refreshed"
+        /usr/local/bin/invoke updategeoip >> /usr/src/resilienceacademy/invoke.log
+        echo "updategeoip task done"
+        /usr/local/bin/invoke waitforgeoserver >> /usr/src/resilienceacademy/invoke.log
+        echo "waitforgeoserver task done"
+        /usr/local/bin/invoke geoserverfixture >> /usr/src/resilienceacademy/invoke.log
+        echo "geoserverfixture task done"
+        /usr/local/bin/invoke monitoringfixture >> /usr/src/resilienceacademy/invoke.log
+        echo "monitoringfixture task done"
+        /usr/local/bin/invoke updateadmin >> /usr/src/resilienceacademy/invoke.log
+        echo "updateadmin task done"
+
 
         cmd=$UWSGI_CMD
         echo "Executing UWSGI server $cmd for Production"
