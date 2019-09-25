@@ -449,7 +449,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "hostgeonode",
-                "url": "http://geonode:80/",
+                "url": "{0}://{1}/".format(net_scheme, net_loc),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -463,7 +463,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "hostgeoserver",
-                "url": "{0}".format(os.environ['GEOSERVER_LOCATION']),
+                "url": "{0}".format(os.environ['GEOSERVER_PUBLIC_LOCATION']),
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -477,7 +477,7 @@ def _prepare_monitoring_fixture():
         {
             "fields": {
                 "name": "local-geoserver",
-                "url": "{0}".format(os.environ['GEOSERVER_LOCATION']),
+                "url": "{0}".format(os.environ['GEOSERVER_PUBLIC_LOCATION']),
                 "notes": "",
                 "last_check": d,
                 "active": True,
