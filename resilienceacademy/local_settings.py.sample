@@ -43,7 +43,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', "c)kg5)ne-)9g3mmeqn_xngv(t=y!o@^%cd^ca$&hl^
 
 # per-deployment settings should go here
 SITE_HOST_NAME = os.getenv('SITE_HOST_NAME', 'localhost')
-SITE_HOST_PORT = os.getenv('SITE_HOST_PORT', None)
+SITE_HOST_PORT = os.getenv('SITE_HOST_PORT', 8000)
 _default_siteurl = "http://%s:%s/" % (SITE_HOST_NAME, SITE_HOST_PORT) if SITE_HOST_PORT else "http://%s/" % SITE_HOST_NAME
 SITEURL = os.getenv('SITEURL', _default_siteurl)
 
