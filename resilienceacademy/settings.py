@@ -80,7 +80,7 @@ if UNOCONV_ENABLE:
 
 BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://resilienceacademy.ac.tz/')
 
-MAPSTORE_DEBUG = True
+MAPSTORE_DEBUG = False
 
 ADMIN_MODERATE_UPLOADS = True
 
