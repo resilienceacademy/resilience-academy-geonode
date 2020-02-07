@@ -23,9 +23,15 @@ from django.views.generic import TemplateView
 
 from geonode.urls import urlpatterns
 
+from resilienceacademy import views
+
 urlpatterns += [
 ## include your urls here
-
+    url(r'^api/posts/$',views.posts,name="wp_posts"),
+    url(r'^posts/$',views.posts_html,name="wp_posts_html"),
+    url(r'^api/hello/(?P<the_name>[^/]*)$', views.hello_json.as_view(), name="hello_json"),
+    url(r'^hello/(?P<the_name>[^/]*)$',views.hello_html,name="hello_html"),
+    # url(r'^api/stats/countries/$',views.metric_countries,name="stats_coutries"),
 ]
 
 urlpatterns = [

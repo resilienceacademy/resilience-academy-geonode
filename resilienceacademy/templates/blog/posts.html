@@ -1,0 +1,10 @@
+{% for post in wp_posts %}
+<p>
+    <h1>{{post.title.rendered }}</h1>
+<p>{{post.excerpt.rendered}}</p>
+    <br>
+    <img src="{{post.image_url}}" width="20%" height="30%">
+<br>
+    {{post.date_gmt}}
+</p>
+{% endfor %}

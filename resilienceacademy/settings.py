@@ -77,3 +77,11 @@ UNOCONV_ENABLE = strtobool(os.getenv('UNOCONV_ENABLE', 'True'))
 if UNOCONV_ENABLE:
     UNOCONV_EXECUTABLE = os.getenv('UNOCONV_EXECUTABLE', '/usr/bin/unoconv')
     UNOCONV_TIMEOUT = os.getenv('UNOCONV_TIMEOUT', 30)  # seconds
+
+BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://resilienceacademy.ac.tz/')
+
+MAPSTORE_DEBUG = True
+
+ADMIN_MODERATE_UPLOADS = True
+
+EMAIL_ENABLE = True
