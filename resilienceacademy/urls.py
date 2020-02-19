@@ -38,4 +38,17 @@ urlpatterns = [
    url(r'^/?$',
        TemplateView.as_view(template_name='site_index.html'),
        name='home'),
+  url(r'^contact-us/$',
+        TemplateView.as_view(template_name='contact_us.html'),
+        name='contact-us'),
+    url(r'^term-of-use/$',
+        TemplateView.as_view(
+            template_name='terms_use.html'),
+        name='term-of-use'),
+    url(r'^get-started/$',
+        TemplateView.as_view(template_name='get_started.html'),
+        name='get-started'),
+    url(r'^crd-team/$',
+        TemplateView.as_view(template_name='crd_team.html'),
+        name='crd-team'),
  ] + urlpatterns
