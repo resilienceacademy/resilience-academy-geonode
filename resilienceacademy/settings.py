@@ -40,6 +40,8 @@ if not SITEURL.endswith('/'):
 
 SITENAME = os.getenv("SITENAME", 'resilienceacademy')
 
+ALLOWED_HOSTS="http://staging.geonode.resilienceacademy.ac.tz/"
+
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
 LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
