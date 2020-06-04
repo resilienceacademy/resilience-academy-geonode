@@ -80,9 +80,9 @@ if UNOCONV_ENABLE:
     UNOCONV_EXECUTABLE = os.getenv('UNOCONV_EXECUTABLE', '/usr/bin/unoconv')
     UNOCONV_TIMEOUT = os.getenv('UNOCONV_TIMEOUT', 30)  # seconds
 
-#BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://resilienceacademy.ac.tz/')
+BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://resilienceacademy.ac.tz/')
 
-BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://suza.ac.tz/')
+#BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://suza.ac.tz/')
 
 MAPSTORE_DEBUG = False
 
