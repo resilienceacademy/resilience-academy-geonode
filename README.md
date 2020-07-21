@@ -1,187 +1,227 @@
-# Resilienceacademy
+# Resilienceacademy3
+
+GeoNode template project. Generates a django project with GeoNode support.
 
 ## Table of Contents
 
--  [Setup](#Setup)
--  [Build](#Build)
--  [Customize](#Customize)
+-  [Developer Workshop](#developer-Workshop)
+-  [Create a custom project](#create-a-custom-project)
+-  [Start your server using Docker](#start-your-server-using-docker)
+-  [Run the instance in development mode](#run-the-instance-in-development-mode)
+-  [Run the instance on a public site](#run-the-instance-on-a-public-site)
+-  [Stop the Docker Images](#stop-the-docker-images)
+-  [Backup and Restore from Docker Images](#backup-and-restore-the-docker-images)
+-  [Recommended: Track your changes](#recommended-track-your-changes)
+-  [Hints: Configuring `requirements.txt`](#hints-configuring-requirementstxt)
 
-GeoNode-Project Template for `resilienceacademy`
+## Developer Workshop
 
-## Setup
+Available at
 
-1. Clone the git repository.
+  ```bash
+    http://geonode.org/dev-workshop
+  ```
 
-    ```bash
-    cd /opt
-    git clone https://github.com/geosolutions-it/resilienceacademy.git
-    ```
+## Create a custom project
 
-2. Move to repo folder.
+**NOTE**: *You can call your geonode project whatever you like following the naming conventions for python packages (generally lower case with underscores (``_``). In the examples below, replace ``resilienceacademy3`` with whatever you would like to name your project.*
 
-    ```bash
-    cd /opt/resilienceacademy
-    ```
+### Using a Python virtual environment
 
-3. Customize the environment.
+**NOTE**: *Skip this part if you want to run the project using Docker instead*
 
-    a) `django.env`
+(see [Start your server using Docker](#start-your-server-using-docker))
 
-      ```bash
-      nano scripts/docker/env/production/django.env
-      ```
+To setup your project using a local python virtual environment, follow these instructions:
 
-      ```diff
-      --- a/scripts/docker/env/production/django.env
-      +++ b/scripts/docker/env/production/django.env
-      @@ -3,20 +3,20 @@ GEONODE_INSTANCE_NAME=geonode
-      DOCKER_ENV=production
-      UWSGI_CMD=uwsgi --ini /usr/src/resilienceacademy/uwsgi.ini
-      
-      -SITEURL=https://geonode-06.utu.fi/
-      +SITEURL=https://<public host>/
-      ALLOWED_HOSTS=['django', '*']
-      
-      -GEONODE_LB_HOST_IP=geonode-06.utu.fi
-      +GEONODE_LB_HOST_IP=<public host>
-      # port where the server can be reached on HTTP
-      # GEONODE_LB_PORT=80
-      # port where the server can be reached on HTTPS
-      GEONODE_LB_PORT=443
-      
-      -ADMIN_PASSWORD=admin
-      +ADMIN_PASSWORD=<your admin pwd>
-      -ADMIN_EMAIL=admin@geonode-06.utu.fi
-      +ADMIN_EMAIL=<your admin email>
-      
-      -GEOSERVER_WEB_UI_LOCATION=https://geonode-06.utu.fi/geoserver/
-      -GEOSERVER_PUBLIC_LOCATION=https://geonode-06.utu.fi/geoserver/
-      +GEOSERVER_WEB_UI_LOCATION=https://<public host>/geoserver/
-      +GEOSERVER_PUBLIC_LOCATION=https://<public host>/geoserver/
-      GEOSERVER_LOCATION=http://geoserver:8080/geoserver/
-      
-      @@ -39,7 +39,7 @@ MOSAIC_ENABLED=False
-      BROKER_URL=amqp://guest:guest@rabbitmq:5672/
-      MONITORING_ENABLED=True
-      MODIFY_TOPICCATEGORY=True
-      -
-      +AVATAR_GRAVATAR_SSL=True
-      EXIF_ENABLED=False
-      CREATE_LAYER=False
-      FAVORITE_ENABLED=False
-      ```
-
-    b) `geoserver.env`
-
-      ```bash
-      nano scripts/docker/env/production/geoserver.env
-      ```
-
-      ```diff
-      --- a/scripts/docker/env/production/geoserver.env
-      +++ b/scripts/docker/env/production/geoserver.env
-      @@ -1,6 +1,6 @@
-      DOCKER_HOST_IP
-      
-      -GEONODE_LB_HOST_IP=geonode-06.utu.fi
-      +GEONODE_LB_HOST_IP=<public host>
-      # port where the server can be reached on HTTP
-      # GEONODE_LB_PORT=80
-      # port where the server can be reached on HTTPS
-      ```
-
-    c) `nginx.env`
-
-      ```bash
-      nano scripts/docker/env/production/nginx.env
-      ```
-
-      ```diff
-      --- a/scripts/docker/env/production/nginx.env
-      +++ b/scripts/docker/env/production/nginx.env
-      @@ -1,12 +1,12 @@
-      
-      -ADMIN_EMAIL=admin@geonode-06.utu.fi
-      +ADMIN_EMAIL=<your admin email>
-      
-      # IP or domain name and port where the server can be reached on HTTP (leave HOST empty if you want to use HTTPS only)
-      HTTP_HOST=
-      HTTP_PORT=80
-      
-      # IP or domain name and port where the server can be reached on HTTPS (leave HOST empty if you want to use HTTP only)
-      -HTTPS_HOST=geonode-06.utu.fi
-      +HTTPS_HOST=<public host>
-      HTTPS_PORT=443
-      
-      # Let's Encrypt certificates for https encryption. You must have a domain name as HTTPS_HOST (doesn't work
-      @@ -15,6 +15,6 @@ HTTPS_PORT=443
-      # staging : we get staging certificates (are invalid, but allow to test the process completely and have much higher limit rates)
-      # production : we get a normal certificate (default)
-      #LETSENCRYPT_MODE=disabled
-      -LETSENCRYPT_MODE=staging
-      +LETSENCRYPT_MODE=production
-      
-      RESOLVER=127.0.0.11
-      ```
-
-## Build
-
-1. Double check `docker-compose.yml` and `docker-compose.override.yml` are correctly configured.
-
-2. Run the docker compose build.
-
+1. Prepare the Environment
 
     ```bash
-    cd /opt/resilienceacademy
-    ./docker-build-sh
+    git clone https://github.com/GeoNode/geonode-project.git -b <your_branch>
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+    mkvirtualenv --python=/usr/bin/python3 resilienceacademy3
+    pip install Django==2.2.12
+
+    django-admin startproject --template=./geonode-project -e py,sh,md,rst,json,yml,ini,env,sample,properties -n monitoring-cron -n Dockerfile resilienceacademy3
+
+    cd resilienceacademy3
     ```
 
-3. Follow the logs in order to be sure the container started up correctly.
+2. Setup the Python Dependencies
+
+    **NOTE**: *Important: modify your `requirements.txt` file, by adding the `GeoNode` branch before continue!*
+
+    (see [Hints: Configuring `requirements.txt`](#hints-configuring-requirementstxt))
 
     ```bash
-    docker-compose logs -f django
+    pip install -r requirements.txt --upgrade
+    pip install -e . --upgrade
+
+    # Install GDAL Utilities for Python
+    pip install pygdal=="`gdal-config --version`.*"
+
+    # Dev scripts
+    mv .override_dev_env.sample .override_dev_env
+    mv manage_dev.sh.sample manage_dev.sh
+    mv paver_dev.sh.sample paver_dev.sh
+
+    # Using the Default Settings
+    ./paver_dev.sh reset
+    ./paver_dev.sh setup
+    ./paver_dev.sh sync
+    ./paver_dev.sh start
     ```
 
-    Wait until you see:
+3. Access GeoNode from browser
+
+    **NOTE**: default admin user is ``admin`` (with pw: ``admin``)
 
     ```bash
-    ...
-    django4resilienceacademy | got command ${cmd}
-    django4resilienceacademy | [uWSGI] getting INI configuration from /usr/src/resilienceacademy/uwsgi.ini
+    http://localhost:8000/
     ```
 
-4. Check the GeoNode has correctly started up.
+## Start your server using Docker
+
+You need Docker 1.12 or higher, get the latest stable official release for your platform.
+
+1. Prepare the Environment
 
     ```bash
-    # Browse to
-    https://<public host>/
+    git clone https://github.com/GeoNode/geonode-project.git -b <your_branch>
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+    mkvirtualenv --python=/usr/bin/python3 resilienceacademy3
+    pip install Django==2.2.12
+
+    django-admin startproject --template=./geonode-project -e py,sh,md,rst,json,yml,ini,env,sample,properties -n monitoring-cron -n Dockerfile resilienceacademy3
+
+    cd resilienceacademy3
     ```
 
-## Customize
-
-1. Clone the git repository.
+2. Run `docker-compose` to start it up (get a cup of coffee or tea while you wait)
 
     ```bash
-    cd /opt
-    git clone https://github.com/geosolutions-it/geonode-customisation.git
+    docker-compose build --no-cache
+    docker-compose up -d
     ```
-
-2. Move to repo folder.
 
     ```bash
-    cd /opt/geonode-customisation
+    set COMPOSE_CONVERT_WINDOWS_PATHS=1
     ```
 
-3. Make .sh files executable.
+    before running `docker-compose up`
 
-    ```bash
-    chmod u+x *.sh
-    ```
+3. Access the site on http://localhost/
 
-4. Execute `update.sh`.
+## Run the instance in development mode
 
-    ```bash
-    ./update.sh
-    ```
+### Use dedicated docker-compose files while developing
 
-`update.sh` will always pull latest version from git before updating files. All files will be backed up before updating. Process halts on error.
+**NOTE**: In this example we are going to keep localhost as the target IP for GeoNode
+
+  ```bash
+  docker-compose -f docker-compose.development.yml -f docker-compose.development.override.yml up
+  ```
+
+## Run the instance on a public site
+
+### Preparation of the image (First time only)
+
+**NOTE**: In this example we are going to publish to the public IP http://123.456.789.111
+
+```bash
+vim .env
+  --> replace localhost with 123.456.789.111 everywhere
+```
+
+### Startup the image
+
+```bash
+docker-compose up --build -d
+```
+
+### Stop the Docker Images
+
+```bash
+docker-compose stop
+```
+
+### Fully Wipe-out the Docker Images
+
+**WARNING**: This will wipe out all the repositories created until now.
+
+**NOTE**: The images must be stopped first
+
+```bash
+docker system prune -a
+```
+
+## Backup and Restore from Docker Images
+
+### Run a Backup
+
+```bash
+SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/backup.sh $BKP_FOLDER_NAME
+```
+
+- BKP_FOLDER_NAME:
+  Default value = backup_restore
+  Shared Backup Folder name.
+  The scripts assume it is located on "root" e.g.: /$BKP_FOLDER_NAME/
+
+- SOURCE_URL:
+  Source Server URL, the one generating the "backup" file.
+
+- TARGET_URL:
+  Target Server URL, the one which must be synched.
+
+e.g.:
+
+```bash
+docker exec -it django4{{project_name}} sh -c 'SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/backup.sh $BKP_FOLDER_NAME'
+```
+
+### Run a Restore
+
+```bash
+SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/restore.sh $BKP_FOLDER_NAME
+```
+
+- BKP_FOLDER_NAME:
+  Default value = backup_restore
+  Shared Backup Folder name.
+  The scripts assume it is located on "root" e.g.: /$BKP_FOLDER_NAME/
+
+- SOURCE_URL:
+  Source Server URL, the one generating the "backup" file.
+
+- TARGET_URL:
+  Target Server URL, the one which must be synched.
+
+e.g.:
+
+```bash
+docker exec -it django4{{project_name}} sh -c 'SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/restore.sh $BKP_FOLDER_NAME'
+```
+
+## Recommended: Track your changes
+
+Step 1. Install Git (for Linux, Mac or Windows).
+
+Step 2. Init git locally and do the first commit:
+
+```bash
+git init
+git add *
+git commit -m "Initial Commit"
+```
+
+Step 3. Set up a free account on github or bitbucket and make a copy of the repo there.
+
+## Hints: Configuring `requirements.txt`
+
+You may want to configure your requirements.txt, if you are using additional or custom versions of python packages. For example
+
+```python
+Django==2.2.12
+git+git://github.com/<your organization>/geonode.git@<your branch>
+```

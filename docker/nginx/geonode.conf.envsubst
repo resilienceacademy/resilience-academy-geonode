@@ -48,6 +48,21 @@ location /geoserver {
     proxy_pass http://$upstream;
 }
 
+# Jenkins
+location /jenkins {
+
+    # Using a variable is a trick to let Nginx start even if upstream host is not up yet
+    # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
+    set $upstream jenkins:$JENKINS_HTTP_PORT;
+
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_pass http://$upstream;
+}
+
 # GeoNode
 location /static/ {
   alias /mnt/volumes/statics/static/;
@@ -71,6 +86,27 @@ location /uploaded/ {
       add_header Pragma "public";
       add_header Cache-Control "max-age=31536000, public";
   }
+}
+
+location ~ ^/celery-monitor/? {
+
+    # Using a variable is a trick to let Nginx start even if upstream host is not up yet
+    # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
+    set $upstream celerymonitor:5555;
+
+    rewrite ^/celery-monitor/?(.*)$ /$1 break;
+
+    sub_filter '="/' '="/celery-monitor/';
+    sub_filter_last_modified on;
+    sub_filter_once off;
+
+    # proxy_pass http://unix:/tmp/flower.sock:/;
+    proxy_pass http://$upstream;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_http_version 1.1;
 }
 
 location / {
@@ -107,7 +143,7 @@ location / {
   # uwsgi_params
   include /etc/nginx/uwsgi_params;
 
-  location ~* \.(?:jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|woff|woff2|svg)$ {
+  location ~* \.(?:js|jpg|jpeg|gif|png|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|woff|woff2|svg|xml)$ {
       gzip_static always;
       expires 30d;
       access_log off;

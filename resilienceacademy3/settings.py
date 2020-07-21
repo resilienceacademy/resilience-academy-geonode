@@ -21,10 +21,15 @@
 # Django settings for the GeoNode project.
 import ast
 import os
-from urlparse import urlparse, urlunparse
+try:
+    from urllib.parse import urlparse, urlunparse
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+    from urlparse import urlparse, urlunparse
 # Load more settings from a file called local_settings.py if it exists
 try:
-    from resilienceacademy.local_settings import *
+    from resilienceacademy3.local_settings import *
 #    from geonode.local_settings import *
 except ImportError:
     from geonode.settings import *
@@ -32,15 +37,13 @@ except ImportError:
 #
 # General Django development settings
 #
-PROJECT_NAME = 'resilienceacademy'
+PROJECT_NAME = 'resilienceacademy3'
 
 # add trailing slash to site url. geoserver url will be relative to this
 if not SITEURL.endswith('/'):
     SITEURL = '{}/'.format(SITEURL)
 
-SITENAME = os.getenv("SITENAME", 'resilienceacademy')
-
-#ALLOWED_HOSTS="http://staging.geonode.resilienceacademy.ac.tz/"
+SITENAME = os.getenv("SITENAME", 'resilienceacademy3')
 
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
@@ -84,25 +87,67 @@ BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://resilienceacademy.ac.tz/')
 
 #BLOG_BASE_URL = os.getenv('BLOG_BASE_URL', 'https://suza.ac.tz/')
 
-MAPSTORE_DEBUG = False
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d '
+                      '%(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(message)s',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"], "level": "ERROR", },
+        "geonode": {
+            "handlers": ["console"], "level": "INFO", },
+        "geoserver-restconfig.catalog": {
+            "handlers": ["console"], "level": "ERROR", },
+        "owslib": {
+            "handlers": ["console"], "level": "ERROR", },
+        "pycsw": {
+            "handlers": ["console"], "level": "ERROR", },
+        "celery": {
+            "handlers": ["console"], "level": "DEBUG", },
+        "mapstore2_adapter.plugins.serializers": {
+            "handlers": ["console"], "level": "DEBUG", },
+        "geonode_logstash.logstash": {
+            "handlers": ["console"], "level": "DEBUG", },
+    },
+}
 
-ADMIN_MODERATE_UPLOADS = True
+CENTRALIZED_DASHBOARD_ENABLED = ast.literal_eval(os.getenv('CENTRALIZED_DASHBOARD_ENABLED', 'False'))
+if CENTRALIZED_DASHBOARD_ENABLED and USER_ANALYTICS_ENABLED and 'geonode_logstash' not in INSTALLED_APPS:
+    INSTALLED_APPS += ('geonode_logstash',)
 
-EMAIL_ENABLE = True
+    CELERY_BEAT_SCHEDULE['dispatch_metrics'] = {
+        'task': 'geonode_logstash.tasks.dispatch_metrics',
+        'schedule': 3600.0,
+    }
 
-ADMIN_EMAIL= 'no-reply@utu.fi'
+LDAP_ENABLED = ast.literal_eval(os.getenv('LDAP_ENABLED', 'False'))
+if LDAP_ENABLED and 'geonode_ldap' not in INSTALLED_APPS:
+    INSTALLED_APPS += ('geonode_ldap',)
 
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_HOST_USER = 'noreply.climateriskdatabase@gmail.com'
-#EMAIL_HOST_PASSWORD = 'UniversityTZ2019'
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-
-#ACCOUNT_APPROVAL_REQUIRED =  True
-
-ACCOUNT_EMAIL_REQUIRED = True
-
-#ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-
-REGISTRATION_OPEN=True
+# Add your specific LDAP configuration after this comment:
+# https://docs.geonode.org/en/master/advanced/contrib/#configuration

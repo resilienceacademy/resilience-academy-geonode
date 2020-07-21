@@ -29,8 +29,8 @@ def run_setup_hooks(*args, **kwargs):
 
 class AppConfig(BaseAppConfig):
 
-    name = "resilienceacademy"
-    label = "resilienceacademy"
+    name = "resilienceacademy3"
+    label = "resilienceacademy3"
 
     def ready(self):
         super(AppConfig, self).ready()

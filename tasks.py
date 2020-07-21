@@ -8,7 +8,12 @@ import datetime
 import docker
 import socket
 
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+    from urlparse import urlparse
 from invoke import run, task
 
 BOOTSTRAP_IMAGE_CHEIP = 'codenvy/che-ip:nightly'
@@ -16,26 +21,29 @@ BOOTSTRAP_IMAGE_CHEIP = 'codenvy/che-ip:nightly'
 
 @task
 def waitfordbs(ctx):
-    print "**************************databases*******************************"
+    print("**************************databases*******************************")
     ctx.run("/usr/bin/wait-for-databases {0}".format('db'), pty=True)
 
 
 @task
 def waitforgeoserver(ctx):
-    print "****************************geoserver********************************"
+    print("****************************geoserver********************************")
     while not _rest_api_availability(os.environ['GEOSERVER_LOCATION'] + 'rest'):
         print ("Wait for GeoServer API availability...")
-    print "GeoServer is available for HTTP calls!"
+    print("GeoServer is available for HTTP calls!")
 
 
 @task
 def update(ctx):
-    print "***************************setting env*********************************"
+    print("***************************setting env*********************************")
     ctx.run("env", pty=True)
     pub_ip = _geonode_public_host_ip()
-    print "Public Hostname or IP is {0}".format(pub_ip)
+    print("Public Hostname or IP is {0}".format(pub_ip))
     pub_port = _geonode_public_port()
-    print "Public PORT is {0}".format(pub_port)
+    print("Public PORT is {0}".format(pub_port))
+    pub_protocol = 'https' if pub_port == '443' else 'http'
+    if pub_protocol == 'https' or pub_port == '80':
+        pub_port = None
     db_url = _update_db_connstring()
     geodb_url = _update_geodb_connstring()
     service_ready = False
@@ -43,7 +51,7 @@ def update(ctx):
         try:
             socket.gethostbyname('geonode')
             service_ready = True
-        except BaseException:
+        except Exception:
             time.sleep(10)
 
     override_env = "$HOME/.override_env"
@@ -55,9 +63,10 @@ def update(ctx):
     envs = {
         "local_settings": "{0}".format(_localsettings()),
         "siteurl": os.environ.get('SITEURL',
-                                  'http://{0}:{1}/'.format(pub_ip, pub_port) if pub_port else 'http://{0}/'.format(pub_ip)),
+                                  '{0}://{1}:{2}/'.format(pub_protocol, pub_ip, pub_port) if pub_port else '{0}://{1}/'.format(pub_protocol, pub_ip)),
         "geonode_docker_host": "{0}".format(socket.gethostbyname('geonode')),
-        "public_fqdn": "{0}:{1}".format(pub_ip, pub_port),
+        "public_protocol": pub_protocol,
+        "public_fqdn": "{0}{1}".format(pub_ip, ':' + pub_port if pub_port else ''),
         "public_host": "{0}".format(pub_ip),
         "dburl": os.environ.get('DATABASE_URL', db_url),
         "geodburl": os.environ.get('GEODATABASE_URL', geodb_url),
@@ -65,7 +74,17 @@ def update(ctx):
         "media_root": os.environ.get('MEDIA_ROOT', '/mnt/volumes/statics/uploaded/'),
         "geoip_path": os.environ.get('GEOIP_PATH', '/mnt/volumes/statics/geoip.db'),
         "monitoring": os.environ.get('MONITORING_ENABLED', True),
+        "monitoring_host_name": os.environ.get('MONITORING_HOST_NAME', 'geonode'),
+        "monitoring_service_name": os.environ.get('MONITORING_SERVICE_NAME', 'local-geonode'),
         "monitoring_data_ttl": os.environ.get('MONITORING_DATA_TTL', 7),
+        "geoip_path": os.environ.get('GEOIP_PATH', '/mnt/volumes/statics/geoip.db'),
+        "geonode_geodb_passwd": os.environ.get('GEONODE_GEODATABASE_PASSWORD', 'geonode_data'),
+        "default_backend_datastore": os.environ.get('DEFAULT_BACKEND_DATASTORE', 'datastore'),
+        "geonode_db_passwd": os.environ.get('GEONODE_DATABASE_PASSWORD', 'geonode'),
+        "geonode_geodb": os.environ.get('GEONODE_GEODATABASE', 'geonode_data'),
+        "db_url": os.environ.get('DATABASE_URL', 'postgres://geonode:geonode@db:5432/geonode'),
+        "geodb_url": os.environ.get('GEODATABASE_URL', 'postgis://geonode:geonode@db:5432/geonode_data'),
+        "geonode_db": os.environ.get('GEONODE_DATABASE', 'geonode'),
         "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://geoserver:8080/geoserver/'),
         "gs_web_ui_loc": os.environ.get('GEOSERVER_WEB_UI_LOCATION',
                                         'http://{0}:{1}/geoserver/'.format(pub_ip, pub_port) if pub_port else 'http://{0}/geoserver/'.format(pub_ip)),
@@ -76,7 +95,7 @@ def update(ctx):
     }
     try:
         current_allowed = ast.literal_eval(os.getenv('ALLOWED_HOSTS') or \
-                                           "['{public_fqdn}', '{public_host}', 'localhost', 'django', 'resilienceacademy',]".format(**envs))
+                                           "['{public_fqdn}', '{public_host}', 'localhost', 'django', 'resilienceacademy3',]".format(**envs))
     except ValueError:
         current_allowed = []
     current_allowed.extend(['{}'.format(pub_ip), '{}:{}'.format(pub_ip, pub_port)])
@@ -87,11 +106,27 @@ def update(ctx):
     ctx.run("echo export MONITORING_ENABLED=\
 {monitoring} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export MONITORING_HOST_NAME=\
-{geonode_docker_host} >> {override_fn}".format(**envs), pty=True)
+{monitoring_host_name} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export MONITORING_SERVICE_NAME=\
-local-geonode >> {override_fn}".format(**envs), pty=True)
+{monitoring_service_name} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export MONITORING_DATA_TTL=\
 {monitoring_data_ttl} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEOIP_PATH=\
+{geoip_path} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEONODE_GEODATABASE_PASSWORD=\
+{geonode_geodb_passwd} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export DEFAULT_BACKEND_DATASTORE=\
+{default_backend_datastore} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEONODE_DATABASE_PASSWORD=\
+{geonode_db_passwd} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEONODE_GEODATABASE=\
+{geonode_geodb} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export DATABASE_URL=\
+{db_url} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEODATABASE_URL=\
+{geodb_url} >> {override_fn}".format(**envs), pty=True)
+    ctx.run("echo export GEONODE_DATABASE=\
+{geonode_db} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export GEOSERVER_LOCATION=\
 {gs_loc} >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export GEOSERVER_WEB_UI_LOCATION=\
@@ -123,13 +158,13 @@ local-geonode >> {override_fn}".format(**envs), pty=True)
     ctx.run("echo export LOGOUT_REDIRECT_URL=\
 {siteurl} >> {override_fn}".format(**envs), pty=True)
     ctx.run("source %s" % override_env, pty=True)
-    print "****************************finalize env**********************************"
+    print("****************************finalize env**********************************")
     ctx.run("env", pty=True)
 
 
 @task
 def migrations(ctx):
-    print "**************************migrations*******************************"
+    print("**************************migrations*******************************")
     ctx.run("python manage.py makemigrations --noinput --merge --settings={0}".format(
         _localsettings()
     ), pty=True)
@@ -151,15 +186,15 @@ def migrations(ctx):
 
 @task
 def statics(ctx):
-    print "**************************statics*******************************"
+    print("**************************statics*******************************")
     ctx.run('mkdir -p /mnt/volumes/statics/{static,uploads}')
-    ctx.run("python manage.py collectstatic --noinput --clear --settings={0}".format(
+    ctx.run("python manage.py collectstatic --noinput --settings={0}".format(
         _localsettings()
     ), pty=True)
 
 @task
 def prepare(ctx):
-    print "**********************prepare fixture***************************"
+    print("**********************prepare fixture***************************")
     ctx.run("rm -rf /tmp/default_oauth_apps_docker.json", pty=True)
     _prepare_oauth_fixture()
     ctx.run("rm -rf /tmp/default_site.json", pty=True)
@@ -180,52 +215,56 @@ def prepare(ctx):
 
 @task
 def fixtures(ctx):
-    print "**************************fixtures********************************"
+    print("**************************fixtures********************************")
     ctx.run("python manage.py loaddata sample_admin \
 --settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py loaddata /tmp/default_oauth_apps_docker.json \
 --settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py loaddata /tmp/default_site.json \
 --settings={0}".format(_localsettings()), pty=True)
-    ctx.run("python manage.py loaddata /usr/src/resilienceacademy/fixtures/initial_data.json \
+    ctx.run("python manage.py loaddata /usr/src/resilienceacademy3/fixtures/initial_data.json \
 --settings={0}".format(_localsettings()), pty=True)
     ctx.run("python manage.py set_all_layers_alternate \
 --settings={0}".format(_localsettings()), pty=True)
-    ctx.run("python manage.py set_all_layers_metadata -d \
---settings={0}".format(_localsettings()), pty=True)
+#     ctx.run("python manage.py set_all_layers_metadata -d \
+# --settings={0}".format(_localsettings()), pty=True)
+
 
 @task
 def collectstatic(ctx):
-    print "************************static artifacts******************************"
+    print("************************static artifacts******************************")
     ctx.run("django-admin.py collectstatic --noinput \
 --settings={0}".format(_localsettings()), pty=True)
 
 
 @task
 def geoserverfixture(ctx):
-    print "********************geoserver fixture********************************"
+    print("********************geoserver fixture********************************")
     _geoserver_info_provision(os.environ['GEOSERVER_LOCATION'] + "rest/")
 
 
 @task
 def monitoringfixture(ctx):
-    print "*******************monitoring fixture********************************"
+    print("*******************monitoring fixture********************************")
     ctx.run("rm -rf /tmp/default_monitoring_apps_docker.json", pty=True)
     _prepare_monitoring_fixture()
-    ctx.run("django-admin.py loaddata /tmp/default_monitoring_apps_docker.json \
+    try:
+        ctx.run("django-admin.py loaddata /tmp/default_monitoring_apps_docker.json \
 --settings={0}".format(_localsettings()), pty=True)
+    except Exception as e:
+        print("ERROR installing monitoring fixture: " + str(e))
 
 
 @task
 def updategeoip(ctx):
-    print "**************************update geoip*******************************"
+    print("**************************update geoip*******************************")
     ctx.run("django-admin.py updategeoip \
     --settings={0}".format(_localsettings()), pty=True)
 
 
 @task
 def updateadmin(ctx):
-    print "***********************update admin details**************************"
+    print("***********************update admin details**************************")
     ctx.run("rm -rf /tmp/django_admin_docker.json", pty=True)
     _prepare_admin_fixture(os.environ.get('ADMIN_PASSWORD', 'admin'), os.environ.get('ADMIN_EMAIL', 'admin@example.org'))
     ctx.run("django-admin.py loaddata /tmp/django_admin_docker.json \
@@ -234,13 +273,13 @@ def updateadmin(ctx):
 
 @task
 def collectmetrics(ctx):
-    print "************************collect metrics******************************"
+    print("************************collect metrics******************************")
     ctx.run("python -W ignore manage.py collect_metrics  \
     --settings={0} -n -t xml".format(_localsettings()), pty=True)
 
 @task
 def initialized(ctx):
-    print "**************************init file********************************"
+    print("**************************init file********************************")
     ctx.run('date > /mnt/volumes/statics/geonode_init.lock')
 
 def _docker_host_ip():
@@ -299,7 +338,7 @@ def _update_geodb_connstring():
 
 
 def _localsettings():
-    settings = os.getenv('DJANGO_SETTINGS_MODULE', 'resilienceacademy.settings')
+    settings = os.getenv('DJANGO_SETTINGS_MODULE', 'resilienceacademy3.settings')
     return settings
 
 
@@ -309,13 +348,13 @@ def _rest_api_availability(url):
         r = requests.request('get', url, verify=False)
         r.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xxx
     except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-        print "GeoServer connection error is {0}".format(e)
+        print("GeoServer connection error is {0}".format(e))
         return False
     except requests.exceptions.HTTPError as er:
-        print "GeoServer HTTP error is {0}".format(er)
+        print("GeoServer HTTP error is {0}".format(er))
         return False
     else:
-        print "GeoServer API are available!"
+        print("GeoServer API are available!")
         return True
 
 
@@ -341,7 +380,7 @@ def _geonode_public_port():
 def _geoserver_info_provision(url):
     from django.conf import settings
     from geoserver.catalog import Catalog
-    print "Setting GeoServer Admin Password..."
+    print("Setting GeoServer Admin Password...")
     cat = Catalog(url,
         username=settings.OGC_SERVER_DEFAULT_USER,
         password=settings.OGC_SERVER_DEFAULT_PASSWORD
@@ -355,22 +394,21 @@ def _geoserver_info_provision(url):
     <newPassword>{0}</newPassword>
 </userPassword>""".format(os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver'))
 
-    print data
     response = cat.http_request(cat.service_url + '/security/self/password', method="PUT", data=data, headers=headers)
-    print "Response Code: %s" % response.status_code
+    print("Response Code: %s" % response.status_code)
     if response.status_code == 200:
-        print "GeoServer admin password updated SUCCESSFULLY!"
+        print("GeoServer admin password updated SUCCESSFULLY!")
     else:
-        print "WARNING: GeoServer admin password *NOT* updated: code [%s]" % response.status_code
+        print("WARNING: GeoServer admin password *NOT* updated: code [%s]" % response.status_code)
 
 
 def _prepare_oauth_fixture():
     upurl = urlparse(os.environ['SITEURL'])
     net_scheme = upurl.scheme
     pub_ip = _geonode_public_host_ip()
-    print "Public Hostname or IP is {0}".format(pub_ip)
+    print("Public Hostname or IP is {0}".format(pub_ip))
     pub_port = _geonode_public_port()
-    print "Public PORT is {0}".format(pub_port)
+    print("Public PORT is {0}".format(pub_port))
     default_fixture = [
         {
             "model": "oauth2_provider.application",
@@ -417,25 +455,35 @@ def _prepare_monitoring_fixture():
     net_scheme = upurl.scheme
     net_loc = upurl.netloc
     pub_ip = _geonode_public_host_ip()
-    print "Public Hostname or IP is {0}".format(pub_ip)
+    print("Public Hostname or IP is {0}".format(pub_ip))
     pub_port = _geonode_public_port()
-    print "Public PORT is {0}".format(pub_port)
+    print("Public PORT is {0}".format(pub_port))
     #d = str(datetime.datetime.now())
     d = '1970-01-01 00:00:00'
     default_fixture = [
         {
             "fields": {
                 "active": True,
-                "ip": "{0}".format(os.environ['MONITORING_HOST_NAME']),
-                "name": "geonode"
+                "ip": "{0}".format(socket.gethostbyname('geonode')),
+                "name": "{0}".format(os.environ['MONITORING_HOST_NAME'])
             },
             "model": "monitoring.host",
             "pk": 1
         },
         {
             "fields": {
-                "name": "local-geonode",
-                "url": "{0}://{1}/".format(net_scheme, net_loc),
+                "active": True,
+                "ip": "{0}".format(socket.gethostbyname('geoserver')),
+                "name": "geoserver"
+            },
+            "model": "monitoring.host",
+            "pk": 2
+        },
+        {
+            "fields": {
+                "name": "{0}".format(os.environ['MONITORING_SERVICE_NAME']),
+                # "url": "{0}://{1}/".format(net_scheme, net_loc),
+                "url": "http://geonode/",
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -448,8 +496,9 @@ def _prepare_monitoring_fixture():
         },
         {
             "fields": {
-                "name": "hostgeonode",
-                "url": "{0}://{1}/".format(net_scheme, net_loc),
+                "name": "geoserver-hostgeonode",
+                # "url": "{0}://{1}/".format(net_scheme, net_loc),
+                "url": "http://geonode/",
                 "notes": "",
                 "last_check": d,
                 "active": True,
@@ -462,12 +511,12 @@ def _prepare_monitoring_fixture():
         },
         {
             "fields": {
-                "name": "hostgeoserver",
-                "url": "{0}".format(os.environ['GEOSERVER_PUBLIC_LOCATION']),
+                "name": "geoserver-hostgeoserver",
+                "url": "{0}".format(os.environ['GEOSERVER_LOCATION']),
                 "notes": "",
                 "last_check": d,
                 "active": True,
-                "host": 1,
+                "host": 2,
                 "check_interval": "00:01:00",
                 "service_type": 4
             },
@@ -476,12 +525,12 @@ def _prepare_monitoring_fixture():
         },
         {
             "fields": {
-                "name": "local-geoserver",
-                "url": "{0}".format(os.environ['GEOSERVER_PUBLIC_LOCATION']),
+                "name": "default-geoserver",
+                "url": "http://geoserver:8080/geoserver/",
                 "notes": "",
                 "last_check": d,
                 "active": True,
-                "host": 1,
+                "host": 2,
                 "check_interval": "00:01:00",
                 "service_type": 2
             },

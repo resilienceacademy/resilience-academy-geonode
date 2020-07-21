@@ -8,7 +8,7 @@ if [ -z ${DOCKER_HOST_IP} ]
 then
 
     echo "DOCKER_HOST_IP is empty so I'll run the python utility \n" >> /usr/local/tomcat/tmp/set_geoserver_auth.log
-    echo export DOCKER_HOST_IP=`python /usr/local/tomcat/tmp/get_dockerhost_ip.py` >> /root/.override_env
+    echo export DOCKER_HOST_IP=`python3 /usr/local/tomcat/tmp/get_dockerhost_ip.py` >> /root/.override_env
     echo "The calculated value is now DOCKER_HOST_IP='$DOCKER_HOST_IP' \n" >> /usr/local/tomcat/tmp/set_geoserver_auth.log
 
 else
@@ -46,7 +46,7 @@ fi
 if [ -z `echo ${NGINX_BASE_URL} | sed 's/http:\/\/\([^:]*\).*/\1/'` ]
 then
     echo "NGINX_BASE_URL is empty so I'll use the static nginx hostname \n" >> /usr/local/tomcat/tmp/set_geoserver_auth.log
-    # echo export NGINX_BASE_URL=`python /usr/local/tomcat/tmp/get_nginxhost_ip.py` >> /root/.override_env
+    # echo export NGINX_BASE_URL=`python3 /usr/local/tomcat/tmp/get_nginxhost_ip.py` >> /root/.override_env
     # TODO rework get_nginxhost_ip to get URL with static hostname from nginx service name
     # + exposed port of that container i.e. http://geonode:80
     echo export NGINX_BASE_URL=http://geonode:80 >> /root/.override_env
@@ -98,6 +98,9 @@ sed -i -e 's/localhost/rabbitmq/g' ${GEOSERVER_DATA_DIR}/notifier/notifier.xml
 
 # exclude wrong dependencies
 sed -i -e 's/xom-\*\.jar/xom-\*\.jar,bcprov\*\.jar/g' /usr/local/tomcat/conf/catalina.properties
+
+# enable geofence-datasource to Postgis
+cp /usr/local/tomcat/tmp/datasource-ovr.properties ${GEOSERVER_DATA_DIR}/geofence/geofence-datasource-ovr.properties
 
 # start tomcat
 exec env JAVA_OPTS="${JAVA_OPTS}" catalina.sh run

@@ -22,6 +22,7 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from geonode.urls import urlpatterns
+from geonode.monitoring import register_url_event
 
 from resilienceacademy import views
 
@@ -34,10 +35,12 @@ urlpatterns += [
     # url(r'^api/stats/countries/$',views.metric_countries,name="stats_coutries"),
 ]
 
+homepage = register_url_event()(TemplateView.as_view(template_name='site_index.html'))
+
 urlpatterns = [
-   url(r'^/?$',
-       TemplateView.as_view(template_name='site_index.html'),
-       name='home'),
+    url(r'^/?$',
+        homepage,
+        name='home'),
   url(r'^contact-us/$',
         TemplateView.as_view(template_name='contact_us.html'),
         name='contact-us'),

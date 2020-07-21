@@ -20,12 +20,12 @@
 
 import os
 
-__version__ = (2, 10, 0, 'final', 0)
+__version__ = (3, 0, 0, 'final', 0)
 
 
-default_app_config = "resilienceacademy.apps.AppConfig"
+default_app_config = "resilienceacademy3.apps.AppConfig"
 
 
 def get_version():
-    import resilienceacademy.version
-    return resilienceacademy.version.get_version(__version__)
+    import resilienceacademy3.version
+    return resilienceacademy3.version.get_version(__version__)
