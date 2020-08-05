@@ -1,17 +1,17 @@
 {% verbatim %}
 <div class="row">
-  <article ng-repeat="group in results" resource_id="{{ group.id }}" ng-cloak class="ng-cloak">
+    <article ng-repeat="group_profile in results" resource_id="{{ id }}" ng-cloak class="ng-cloak">
 
     <div class="col-xs-12 item-container">
 
        <div class="col-xs-4 group-img">
-            <img class="img-responsive" ng-show="{{ group.group_profile.logo }}" ng-src="{{ group.group_profile.logo }}"  alt="{{ group.group_profile.title }}">
+                <img class="img-responsive" ng-src="{{ group_profile.logo_url }}" alt="{{ group_profile.title }}">
         </div>
         <div class="col-xs-8 item-details">
-          <h4><a href="{{ group.group_profile.detail_url }}">{{ group.group_profile.title }}</a></h4>
+                <h4><a href="{{ group_profile.detail_url }}">{{ group_profile.title }}</a></h4>
           <p class="abstract">
-              {{ group.group_profile.description | limitTo: 300 }}
-              {{ group.group_profile.description.length  > 300 ? '...' : ''}}
+                    {{ group_profile.description | limitTo: 300 }}
+                    {{ group_profile.description.length > 300 ? '...' : ''}}
           </p>
          <!-- <div class="row">
             <div class="col-xs-12 item-items">
