@@ -1,5 +1,6 @@
 from django import template
-from resilienceacademy.views import _fetch_wp_json
+from resilienceacademy3.views import _fetch_wp_json
+
 register = template.Library()
 
 @register.simple_tag

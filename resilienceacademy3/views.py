@@ -13,8 +13,8 @@ class hello_json(View):
         filter=request.GET.get('filter',None)
         out = {}
         out['hello'] = the_name or 'world'
-	if filter:
-	    out['filter']=filter
+        if filter:
+            out['filter']=filter
         return json_response(out)
 
 

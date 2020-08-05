@@ -24,7 +24,7 @@ from django.views.generic import TemplateView
 from geonode.urls import urlpatterns
 from geonode.monitoring import register_url_event
 
-from resilienceacademy import views
+from resilienceacademy3 import views
 
 urlpatterns += [
 ## include your urls here
