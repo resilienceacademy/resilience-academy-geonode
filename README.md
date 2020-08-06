@@ -30,7 +30,11 @@ GeoNode-Project Template for `resilienceacademy`
       ```bash
       nano .env
       ```
-
+      
+      Change all occurrencies of `https://geonode.resilienceacademy.ac.tz` with your final host name.
+      
+      Update the other variables as follows:
+      
       ```diff
       diff --git a/.env b/.env
       index 12db1c7..78efb4f 100644
