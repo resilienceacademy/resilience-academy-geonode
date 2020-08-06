@@ -1,227 +1,148 @@
 # Resilienceacademy3
 
-GeoNode template project. Generates a django project with GeoNode support.
-
 ## Table of Contents
 
--  [Developer Workshop](#developer-Workshop)
--  [Create a custom project](#create-a-custom-project)
--  [Start your server using Docker](#start-your-server-using-docker)
--  [Run the instance in development mode](#run-the-instance-in-development-mode)
--  [Run the instance on a public site](#run-the-instance-on-a-public-site)
--  [Stop the Docker Images](#stop-the-docker-images)
--  [Backup and Restore from Docker Images](#backup-and-restore-the-docker-images)
--  [Recommended: Track your changes](#recommended-track-your-changes)
--  [Hints: Configuring `requirements.txt`](#hints-configuring-requirementstxt)
+-  [Setup](#Setup)
+-  [Build](#Build)
+-  [Customize](#Customize)
 
-## Developer Workshop
+GeoNode-Project Template for `resilienceacademy`
 
-Available at
+## Setup
 
-  ```bash
-    http://geonode.org/dev-workshop
-  ```
-
-## Create a custom project
-
-**NOTE**: *You can call your geonode project whatever you like following the naming conventions for python packages (generally lower case with underscores (``_``). In the examples below, replace ``resilienceacademy3`` with whatever you would like to name your project.*
-
-### Using a Python virtual environment
-
-**NOTE**: *Skip this part if you want to run the project using Docker instead*
-
-(see [Start your server using Docker](#start-your-server-using-docker))
-
-To setup your project using a local python virtual environment, follow these instructions:
-
-1. Prepare the Environment
+1. Clone the git repository.
 
     ```bash
-    git clone https://github.com/GeoNode/geonode-project.git -b <your_branch>
-    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-    mkvirtualenv --python=/usr/bin/python3 resilienceacademy3
-    pip install Django==2.2.12
-
-    django-admin startproject --template=./geonode-project -e py,sh,md,rst,json,yml,ini,env,sample,properties -n monitoring-cron -n Dockerfile resilienceacademy3
-
-    cd resilienceacademy3
+    cd /opt
+    git clone https://github.com/geosolutions-it/resilienceacademy.git -b resilienceacademy3
     ```
 
-2. Setup the Python Dependencies
-
-    **NOTE**: *Important: modify your `requirements.txt` file, by adding the `GeoNode` branch before continue!*
-
-    (see [Hints: Configuring `requirements.txt`](#hints-configuring-requirementstxt))
+2. Move to repo folder.
 
     ```bash
-    pip install -r requirements.txt --upgrade
-    pip install -e . --upgrade
-
-    # Install GDAL Utilities for Python
-    pip install pygdal=="`gdal-config --version`.*"
-
-    # Dev scripts
-    mv .override_dev_env.sample .override_dev_env
-    mv manage_dev.sh.sample manage_dev.sh
-    mv paver_dev.sh.sample paver_dev.sh
-
-    # Using the Default Settings
-    ./paver_dev.sh reset
-    ./paver_dev.sh setup
-    ./paver_dev.sh sync
-    ./paver_dev.sh start
+    cd /opt/resilienceacademy3
     ```
 
-3. Access GeoNode from browser
+3. Customize the environment.
 
-    **NOTE**: default admin user is ``admin`` (with pw: ``admin``)
+    `.env`
+
+      ```bash
+      nano .env
+      ```
+
+      ```diff
+      diff --git a/.env b/.env
+      index 12db1c7..78efb4f 100644
+      --- a/.env
+      +++ b/.env
+      @@ -43,7 +43,7 @@ GEOSERVER_WEB_UI_LOCATION=https://geonode.resilienceacademy.ac.tz/geoserver/
+       GEOSERVER_PUBLIC_LOCATION=https://geonode.resilienceacademy.ac.tz/geoserver/
+       GEOSERVER_LOCATION=http://geoserver:8080/geoserver/
+       GEOSERVER_ADMIN_USER=admin
+      -GEOSERVER_ADMIN_PASSWORD=geoserver
+      +GEOSERVER_ADMIN_PASSWORD=<your_geoserver_admin_password>
+
+       OGC_REQUEST_TIMEOUT=30
+       OGC_REQUEST_MAX_RETRIES=1
+      @@ -99,8 +99,8 @@ RESOLVER=127.0.0.11
+       # #################
+       # Admin Settings
+       ADMIN_USERNAME=admin
+      -ADMIN_PASSWORD=admin
+      -ADMIN_EMAIL=no-reply@utu.fi
+      +ADMIN_PASSWORD=<your_geonode_admin_password>
+      +ADMIN_EMAIL=admin@geonode.resilienceacademy.ac.tz
+
+       # EMAIL Notifications
+       EMAIL_ENABLE=False
+      @@ -130,16 +130,16 @@ ACCOUNT_EMAIL_VERIFICATION=none
+       ACCOUNT_EMAIL_CONFIRMATION_EMAIL=False
+       ACCOUNT_EMAIL_CONFIRMATION_REQUIRED=False
+       ACCOUNT_AUTHENTICATION_METHOD=username_email
+      -AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME=False
+      +AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME=True
+
+       # OAuth2
+      -OAUTH2_API_KEY=
+      -OAUTH2_CLIENT_ID=Jrchz2oPY3akmzndmgUTYrs9gczlgoV20YPSvqaV
+      -OAUTH2_CLIENT_SECRET=rCnp5txobUo83EpQEblM8fVj3QT5zb5qRfxNsuPzCqZaiRyIoxM4jdgMiZKFfePBHYXCLd7B8NlkfDBY9HKeIQPcy5Cp08KQNpRHQbjpLItDHv12GvkSeXp6OxaUETv3
+      +OAUTH2_API_KEY=
+      +OAUTH2_CLIENT_ID=<your_new_oauth2_cliend_id>
+      +OAUTH2_CLIENT_SECRET=<your_new_oauth2_cliend_secret>
+
+       # GeoNode APIs
+       API_LOCKDOWN=False
+      -TASTYPIE_APIKEY=
+      +TASTYPIE_APIKEY=<your_new_oauth2_tastypie_key>
+
+       # #################
+       # Production and
+      @@ -201,3 +201,4 @@ ADMIN_MODERATE_UPLOADS=True
+       # Other Apps
+       BLOG_BASE_URL=https://resilienceacademy.ac.tz/
+       # BLOG_BASE_URL=https://suza.ac.tz/
+      +
+      ```
+
+## Build
+
+1. Double check `docker-compose.yml` and `docker-compose.override.yml` are correctly configured.
+
+2. Run the docker compose build.
+
 
     ```bash
-    http://localhost:8000/
+    cd /opt/resilienceacademy3
+    ./docker-build-sh
     ```
 
-## Start your server using Docker
-
-You need Docker 1.12 or higher, get the latest stable official release for your platform.
-
-1. Prepare the Environment
+3. Follow the logs in order to be sure the container started up correctly.
 
     ```bash
-    git clone https://github.com/GeoNode/geonode-project.git -b <your_branch>
-    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-    mkvirtualenv --python=/usr/bin/python3 resilienceacademy3
-    pip install Django==2.2.12
-
-    django-admin startproject --template=./geonode-project -e py,sh,md,rst,json,yml,ini,env,sample,properties -n monitoring-cron -n Dockerfile resilienceacademy3
-
-    cd resilienceacademy3
+    docker-compose logs -f django
     ```
 
-2. Run `docker-compose` to start it up (get a cup of coffee or tea while you wait)
+    Wait until you see:
 
     ```bash
-    docker-compose build --no-cache
-    docker-compose up -d
+    ...
+    django4resilienceacademy | got command ${cmd}
+    django4resilienceacademy | [uWSGI] getting INI configuration from /usr/src/resilienceacademy/uwsgi.ini
     ```
+
+4. Check the GeoNode has correctly started up.
 
     ```bash
-    set COMPOSE_CONVERT_WINDOWS_PATHS=1
+    # Browse to
+    https://<public host>/
     ```
 
-    before running `docker-compose up`
+## Customize
 
-3. Access the site on http://localhost/
+1. Clone the git repository.
 
-## Run the instance in development mode
+    ```bash
+    cd /opt
+    git clone https://github.com/resilienceacademy/geonode-customisation.git -b resilienceacademy3
+    ```
 
-### Use dedicated docker-compose files while developing
+2. Move to repo folder.
 
-**NOTE**: In this example we are going to keep localhost as the target IP for GeoNode
+    ```bash
+    cd /opt/geonode-customisation
+    ```
 
-  ```bash
-  docker-compose -f docker-compose.development.yml -f docker-compose.development.override.yml up
-  ```
+3. Make .sh files executable.
 
-## Run the instance on a public site
+    ```bash
+    chmod u+x *.sh
+    ```
 
-### Preparation of the image (First time only)
+4. Execute `update.sh`.
 
-**NOTE**: In this example we are going to publish to the public IP http://123.456.789.111
+    ```bash
+    ./update.sh
+    ```
 
-```bash
-vim .env
-  --> replace localhost with 123.456.789.111 everywhere
-```
-
-### Startup the image
-
-```bash
-docker-compose up --build -d
-```
-
-### Stop the Docker Images
-
-```bash
-docker-compose stop
-```
-
-### Fully Wipe-out the Docker Images
-
-**WARNING**: This will wipe out all the repositories created until now.
-
-**NOTE**: The images must be stopped first
-
-```bash
-docker system prune -a
-```
-
-## Backup and Restore from Docker Images
-
-### Run a Backup
-
-```bash
-SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/backup.sh $BKP_FOLDER_NAME
-```
-
-- BKP_FOLDER_NAME:
-  Default value = backup_restore
-  Shared Backup Folder name.
-  The scripts assume it is located on "root" e.g.: /$BKP_FOLDER_NAME/
-
-- SOURCE_URL:
-  Source Server URL, the one generating the "backup" file.
-
-- TARGET_URL:
-  Target Server URL, the one which must be synched.
-
-e.g.:
-
-```bash
-docker exec -it django4{{project_name}} sh -c 'SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/backup.sh $BKP_FOLDER_NAME'
-```
-
-### Run a Restore
-
-```bash
-SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/restore.sh $BKP_FOLDER_NAME
-```
-
-- BKP_FOLDER_NAME:
-  Default value = backup_restore
-  Shared Backup Folder name.
-  The scripts assume it is located on "root" e.g.: /$BKP_FOLDER_NAME/
-
-- SOURCE_URL:
-  Source Server URL, the one generating the "backup" file.
-
-- TARGET_URL:
-  Target Server URL, the one which must be synched.
-
-e.g.:
-
-```bash
-docker exec -it django4{{project_name}} sh -c 'SOURCE_URL=$SOURCE_URL TARGET_URL=$TARGET_URL ./{{project_name}}/br/restore.sh $BKP_FOLDER_NAME'
-```
-
-## Recommended: Track your changes
-
-Step 1. Install Git (for Linux, Mac or Windows).
-
-Step 2. Init git locally and do the first commit:
-
-```bash
-git init
-git add *
-git commit -m "Initial Commit"
-```
-
-Step 3. Set up a free account on github or bitbucket and make a copy of the repo there.
-
-## Hints: Configuring `requirements.txt`
-
-You may want to configure your requirements.txt, if you are using additional or custom versions of python packages. For example
-
-```python
-Django==2.2.12
-git+git://github.com/<your organization>/geonode.git@<your branch>
-```
+`update.sh` will always pull latest version from git before updating files. All files will be backed up before updating. Process halts on error.
