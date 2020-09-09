@@ -1,8 +1,216 @@
-.home .big-search {
-    /* background: #333333;*/
-    background: transparent;
+/*!
+ * Resilience Academy
+
+ * Custom CSS
+
+ * Copyright 2019
+ * https://resilienceacademy.ac.tz
+ */
+
+section.custom-partners {
+    padding-top: 2em;
+}
+
+section.custom-raactivitites {
+    padding-top: 2em;
+    background-color: #2c689c;
+    background: #2c689c;
+}
+
+.text-ra {
+    color: #ffffff;
+}
+
+footer.custom-footer {
+    /*background: white;*/
+    background: #007ab8;
+    margin-top: 20px;
+    /*border-top: 1px solid black;*/
+    color: black;
+}
+
+footer img.footer-img {
+    height: 50px;
+}
+
+div.item-details p.abstract {
+    height: 88px;
+    overflow: hidden;
+}
+
+div.item-details h4 {
+    height: 47px;
+    overflow: hidden;
+}
+
+div.custom-search {
+    padding-top: 10px;
+}
+
+body {
+    /* background: #333333; */
+    background: white;
+}
+
+.home .navbar-inverse,
+.navbar-inverse {
+    background-color: #0075b7;
+}
+
+body div.container div.navbar-header a.navbar-brand {
+    background-image: url(../img/RA-Shield_Horizantal.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.home .jumbotron {
+    background-color: #2c689c
+}
+
+.home .jumbotron .container {
+    position: relative;
+    z-index: 1;
+}
+
+.home .jumbotron:after {
+    content: "";
+    /* old jumbotron: background-image: url(../img/jumbotron.jpg); */
+    background-image: url(../img/jumbotron-2020-01-16-1723x800.jpg);
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: cover;
+    /* background-size: 100%; */
+    height: 700px;
+    opacity: 0.5;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 0;
+}
+
+.home .jumbotron h1 {
+    text-shadow: 4px 3px 3px #000000;
+}
+
+.home .jumbotron p {
+    text-shadow: 2px 4px 4px #000000;
+}
+
+
+/* Showcase is the container below jumbotron */
+body.home div#wrap section#showcase {
+    background-color: #007CC3;
+}
+
+body.home div#wrap section#showcase a {
+    color: white;
+}
+
+.footer-copyright {
+    background-color: #0075b7;
+}
+
+ .home .big-search {
+   background: #333333;
+    background:transparent;
     color: white;
     padding-bottom: 0;
-    padding-top: 340px;
-    /* margin-bottom: 20px; */
+   padding-top: 340px;  
+  }
+
+
+.home #showcase {
+    background: #eeeeee;
+    margin-top: 6px;
+    padding: 0 0;
+    text-align: center;
+}
+
+.home .custom-ramessage {
+    background: white;
+    color: white;
+    padding-bottom: 2em;
+    padding-top: 3em;
+}
+
+.home .custom-blogs {
+    overflow: hidden;
+    background: #CCCCCC;
+    color: white;
+    padding-bottom: 2em;
+    padding-top: 3em;
+}
+
+#custom-blogs-div {
+    float: left;
+    background-color: grey;
+    padding-bottom: 5%;
+    background: #FFFFFF;
+}
+
+.text-ramessage {
+    color: black;
+}
+
+.footer .footer-text {
+    /*color: #007ab8;*/
+    color: white;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.footer a {
+    /*color: #007ab8;*/
+    color: white;
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+.footer a:hover {
+    /*color: #007ab8;*/
+    color: white;
+}
+
+.institutions {
+    background: white;
+    margin-top: 20px;
+    /*margin-left:500px;*/
+    /*border-top: 1px solid black;*/
+    color: black;
+}
+
+.institutions .bank {
+    padding-left: 50px;
+}
+
+.custom-hr {
+    border: none;
+    border-left: 2px solid;
+    height: 10vh;
+    width: 1px;
+}
+
+.text-info-right {
+    text-align: left;
+}
+
+.text-info-left {
+    text-align: right;
+}
+
+.img-blog {
+    padding-top: 5%;
+}
+
+.group-hr {
+    border: 1px solid;
+    border-color: #007ab8;
+}
+
+.group-img {
+    width: 120px;
+    height: 120px;
 }

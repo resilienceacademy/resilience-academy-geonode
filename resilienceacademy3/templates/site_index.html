@@ -1,24 +1,267 @@
-{% extends 'index.html' %}
+{% extends "geonode_base.html" %}
 {% load i18n %}
+{% load static from staticfiles %}
 {% load base_tags %}
-{% comment %}
-This is where you can override the hero area block. You can simply modify the content below or replace it wholesale to meet your own needs.
-{% endcomment %}
-{% block hero %}
-<div class="jumbotron">
-  <div class="container">
-      {% with jumbotron_welcome_title=custom_theme.jumbotron_welcome_title|default:"Welcome"|template_trans %}
-      <h1>{% trans jumbotron_welcome_title %}</h1>
-      {% endwith %}
-      <p></p>
-      {% with jumbotron_welcome_content=custom_theme.jumbotron_welcome_content|default:"GeoNode is an open source platform for sharing geospatial data and maps."|template_trans %}
-      <p>{% trans jumbotron_welcome_content %}</p>
-      {% endwith %}
-      {% if not custom_theme.jumbotron_cta_hide %}
-     <!-- <p><a class="btn btn-default btn-lg" target="_blank"
-          href="{{custom_theme.jumbotron_cta_link|default:_("http://docs.geonode.org/en/2.10.x/usage/")}}"
-          role="button">{{custom_theme.jumbotron_cta_text|default:_("Get Started &raquo;")}}</a></p>-->
-      {% endif %}
+{% block title %} {% trans "Welcome!" %} - {{ block.super }} {% endblock %}
+
+{% block body_class %}home{% endblock %}
+
+{% block middle %}
+  {{ block.super }}
+
+  {% block hero %}
+  {% if block.super %}
+  {{ block.super }}
+  {% else %}
+  <div class="jumbotron">
+  	<div class="container">
+        <h1>{{custom_theme.jumbotron_welcome_title|default:_("Climate Risk Database ")}} </h1>
+  		<p></p>
+		<p>{{custom_theme.jumbotron_welcome_content|default:_('"The catalyst for resilient urban development in Tanzania"')}}</p> 
+		{% if not custom_theme.jumbotron_cta_hide %}
+  		{% comment %} <p><a class="btn btn-default btn-lg" target="_blank" href="{{custom_theme.jumbotron_cta_link|default:_("http://docs.geonode.org/en/master/tutorials/users/index.html")}}" role="button">{{custom_theme.jumbotron_cta_text|default:_("Welcome to Ra &raquo;")}}</a></p> {% endcomment %}
+		{% endif %}
+	</div>
   </div>
-</div>
-{% endblock hero %}
+  {% endif %}
+  {% endblock hero %}
+
+  {% block mainbody %}
+
+      {% block bigsearch %}
+      {% if block.super %}
+      {{ block.super }}
+      {% else %}
+<div class="big-search">
+      	<div class="container">
+      		<!-- <h1>{% trans "Search for Data." %}</h1> -->
+      		<div class="search">
+      			<form id="search" action="{% url "search" %}" >
+      				<span class="fa fa-search fa-3x"></span>
+      				{% if HAYSTACK_SEARCH %}
+      				<input id="search_input" type="text" placeholder="Search" class="form-control" name="q">
+      				{% else %}
+      				<input id="search_input" type="text" placeholder="Search" class="form-control" name="title__icontains">
+      				{% endif %}
+      			</form>
+      		</div>
+      		
+      	</div>
+      </div>
+
+      {% endif %}
+      {% endblock bigsearch %}
+
+      {% block datasets %}
+      {% endblock datasets %}
+
+      {% block showcase %}
+      <section id="showcase">
+        <div class="row">
+          <div class="container text-center">
+            <div class="row home-facets">
+            {% with facet_type='home' %}
+             {% facets as facets %}
+             <div class="row">
+              <div class="col-md-4">
+                <p><a href="{% url "layer_browse" %}"><i class="fa fa-square-o fa-4x rotate-45"></i></a></p>
+                <h4><a href="{% url "layer_browse" %}">{{ facets.layer|default:_("No") }} {% blocktrans count counter=facets.layer %}Layer{% plural %}Layers{% endblocktrans %}</a></h4>
+              </div>
+              <div class="col-md-4">
+                <p><a href="{% url "maps_browse" %}"><i class="fa fa-map-marker fa-4x"></i></a></p>
+                <h4><a href="{% url "maps_browse" %}">{{ facets.map|default:_("No") }} {% blocktrans count counter=facets.map %}Map{% plural %}Maps{% endblocktrans %}</a></h4>
+              </div>
+              <div class="col-md-4">
+                <p><a href="{% url "profile_browse" %}"><i class="fa fa-user fa-4x"></i></a></p>
+                <h4><a href="{% url "profile_browse" %}">{{ facets.user|default:_("No") }} {% blocktrans count counter=facets.user %}Community{% plural %}Community{% endblocktrans %}</a></h4>
+              </div>
+             </div>
+	     
+             </div>
+            {% endwith %}
+            </div>
+          </div>
+        </div>
+        <!--<div class="row">
+            <div class="container text-center">
+                {% verbatim %}
+                <div ng-app="featured">
+                  <div ng-repeat="item in featured | limitTo:4">
+                    <div class="col-md-3">
+                      <a href="{{ item.detail_url }}"><img ng-src="{{ item.thumbnail_url }}" /></a>
+                      <h4>{{ item.title | limitTo: 20 }}{{item.title.length > 20 ? '...' : ''}}</h4>
+                    </div>
+                  </div>
+                </div>
+          		{% endverbatim %}
+                <!-- <p><a href="/search/">Explore all datasets</a></p> -->
+            <!-- </div>
+        </div>-->
+      </section>
+      {% endblock showcase %}
+
+      <!-- <section class="custom-raactivitites" id="ra-activities">
+        <div class="container text-center">
+          <div class="row">
+              <div class="col-md-2">
+                <h4 class="text-ra">Exposure</h4>
+             </div>
+             <div class="col-md-2">
+                <h4 class="text-ra">Risk</h4>
+              </div>
+           <div class="col-md-2">
+              <h4 class="text-ra">Hazard</h4>
+          </div>
+         <div class="col-md-3">
+            <h4 class="text-ra">Vulnerability</h4>
+         </div>
+         <div class="col-md-3">
+          <h4 class="text-ra">Early Warning</h4>
+       </div>
+          </div>
+        </div>
+      </section> -->
+
+
+      <section class="custom-ramessage" id="ra-message">
+        <div class="container text-center">
+
+             <div class="row">
+              <div class="col-md-12">
+                <h3 class="text-ramessage">
+                  Resilience Academy’s Climate Risk Database (CRD) is a digital geospatial data repository that supports
+research, education, and disaster-risk management practices.
+                </h3>
+              </div>
+          </div>
+        </div>
+      </section>
+<hr>
+
+
+<section class="institutions">
+    <div class="custom-container">
+      <div class="row">
+        <div class="col-md-5">
+	  <div class="row">
+          <h4 class="text-info text-info-left">Initiative by&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;</h4>
+	    <div class="col-md-2 col-md-offset-4">
+               <a href="https://www.tanzania.go.tz/" target="_blank"><img class="footer-img" src="/static/geonode/img/Government-of-Tanzania-Logo.png" /></a>
+            </div>
+            <div class="col-md-2">
+               <a href="https://www.ukaiddirect.org/" target="_blank"><img class="footer-img" src="/static/geonode/img/UKaid-Logo.png" /></a>
+            </div>
+            <div class="col-md-2">
+               <a href="http://www.worldbank.org/en/programs/tanzania-urban-resilience-program" target="_blank"><img class="footer-img" src="/static/geonode/img/TURP-Logo.png" /></a>
+            </div>
+	   <div class="col-md-2">
+               <a href="http://www.worldbank.org/" target="_blank"><img class="footer-img" style="height: 30px; margin-top: 10px;" src="/static/geonode/img/The-World-Bank-logo.png" /></a>
+            </div>
+          </div>
+        </div>
+       <div class="col-lg-2"> <hr class="custom-hr"></div>
+        <div class="col-md-5">
+            <h4 class="text-info text-info-right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Supported by</h4>
+          <div class="row">
+             <div class="col-md-2">
+               <a href="http://www.aru.ac.tz/" target="_blank"><img class="footer-img" src="/static/geonode/img/ARU-logo.jpg" /></a>
+            </div>
+            <div class="col-md-2">
+               <a href="https://www.sua.ac.tz/" target="_blank"><img class="footer-img" src="/static/geonode/img/SUA_logo.png" /></a>
+            </div>
+            <div class="col-md-2">
+               <a href="https://www.suza.ac.tz/" target="_blank"><img class="footer-img" src="/static/geonode/img/logo_suza_suza.png" /></a>
+            </div>
+           <div class="col-md-2">
+               <a href="https://www.udsm.ac.tz/" target="_blank"><img class="footer-img" src="/static/geonode/img/UDSM_logo.png" /></a>
+            </div>
+            <div class="col-md-1">
+               <a href="https://www.utu.fi/en" target="_blank"><img class="footer-img" src="/static/geonode/img/UTU.png" /></a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    </section>
+
+      <!--<div class="row">
+        <hr>
+      </div>-->
+
+      <!-- <section class="custom-blogs" id="ra-blogs">
+        <div class="container text-center">
+          <div class="row">
+              <div class="col-md-12">
+              </div>
+          </div>
+        </div>
+      </section> -->
+
+     <!--<section class="custom-partners" id="partners">
+        <div class="container text-center">
+          <div class="row">
+              <div class="col-md-5">
+                <h4 class="text-info">Initiative by</h4>
+	      </div>
+              <div class="col-md-2">
+                  <hr>
+              </div>
+	      <div class="col-md-5">
+                <h4 class="text-info">Supported by</h4>
+              </div>
+          </div>
+        </div>
+      </section>-->
+    
+
+
+<!--
+      {% block partners %}
+        {% if custom_theme.partners.all %}
+        <section id="partners">
+        <div class="container text-center">
+         <h2>{{ custom_theme.partners_title|default:_("Our partners") }}</h2>
+          <div class="row">
+              {% for partner in custom_theme.partners.all %}
+              <div class="col-md-12">
+                  <div class="partner_logo" style="background-image: url({% if partner.logo %}{{partner.logo.url}}{% else %}{% static 'geonode/img/missing_thumb.png' %}{% endif %})"></div>
+                   <div><a href="{{ partner.partner_link }}" target="_blank">{{ partner.title }}</a></div>
+              </div>
+              {% endfor %}
+          </div>
+        </div>
+        </section>
+        {% endif %}
+      {% endblock partners %}
+-->
+  {% endblock mainbody %}
+
+{% endblock middle %}
+
+{% block extra_script %}
+{{ block.super }}
+{% if DEBUG_STATIC %}
+<script src="{% static "lib/js/angular.js" %}"></script>
+{% endif %}
+<script type="text/javascript">
+    FEATURED_URL = '{% url 'api_dispatch_list' api_name='api' resource_name='featured' %}'
+    'use strict';
+    (function(){
+      var module = angular.module('featured', []);
+      module.run(function($http, $rootScope){
+        $http.get(FEATURED_URL).success(function(data){
+          $rootScope.featured = data.objects;
+        });
+      });
+    })();
+</script>
+<script>
+	$('[data-toggle="tooltip"]').tooltip({container: 'body'});
+</script>
+{% endblock extra_script %}
+
