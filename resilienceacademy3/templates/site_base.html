@@ -1,5 +1,5 @@
-
 {% extends "base.html" %}
+{% load i18n avatar_tags %}
 {% block extra_head %}
       <link href="{{ STATIC_URL }}css/site_base.css" rel="stylesheet"/>
 {% endblock %}
@@ -13,6 +13,96 @@ Add Tab for Third Party Apps
 
 {% endblock %}
 
+ {% block header %}
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <i class="fa fa-navicon fa-lg"></i>
+        </button>
+        <a class="navbar-brand" href="{% url "home" %}">GeoNode</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav toolbar">
+
+          {% block tabs %}
+
+          <li id="nav_layers">
+		      <a href="{% url "layer_browse" %}?limit={{ CLIENT_RESULTS_LIMIT }}">{% trans "Layers" %}</a>
+            </li>
+            <li id="nav_themaps"><a href="{% url "maps_browse" %}?limit={{ CLIENT_RESULTS_LIMIT }}">Thematic Maps</a></li>
+            <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{% url "document_browse" %}">{% trans "Document" %}</a></li>
+                  <li><a href="#">{% trans "Training" %}</a></li>
+		 <li><a href="#">{% trans "Tools" %}</a></li>
+                </ul>
+            </li>
+      
+            <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Community" %}<i class="fa fa-angle-down fa-lg"></i></a>
+                <ul class="dropdown-menu">
+
+		<li><a href="{% url "profile_browse" %}">{% trans "Registered Members" %}</a></li>
+                <li><a href="{% url "group_list" %}">{% trans "Data Owners" %}</a></li>
+                 <li><a href="{% url "group_category_list" %}">{% trans "Community Groups" %}</a></li>
+               
+                </ul>
+            </li>
+            {% endblock %}
+          </ul>
+           <ul class="nav navbar-nav navbar-right">
+            {% if not user.is_authenticated and ACCOUNT_OPEN_SIGNUP %}
+              <li><a href="{% url "account_signup" %}">{% trans "Register" %}</a></li>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <li>
+              <a href="#" class="dropdown-toggle avatar" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                {% autoescape off %}{% avatar user 40 %}{% endautoescape %}
+                {% with full_name=user.first_name|add:' '|add:user.last_name %}
+                  {% if full_name.strip %}
+                    {{ full_name | truncatechars:20 }}
+                  {% else %}
+                    {{ user.username | truncatechars:20 }}
+                  {% endif %}
+                {% endwith %}
+                <i class="fa fa-angle-down fa-lg"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="{{ user.get_absolute_url }}">{% trans "Profile" %}</a></li>
+                <li><a href="{% url "recent-activity" %}">{% trans "Recent Activity" %}</a></li>
+                {% if FAVORITE_ENABLED and user.is_authenticated %}
+                <li><a href="{% url "favorite_list" %}">{% trans "Favorites" %}</a></li>
+                {% endif %}
+                <li><a href="{% url "messages_inbox" %}">{% trans "Inbox" %}</a></li>
+                {% if user.is_superuser or user.is_staff %}
+                    <li role="separator" class="divider"></li>
+                    <li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>
+                    {% if 'geonode.geoserver' in INSTALLED_APPS %}
+                    <li><a href="{{ OGC_SERVER.default.WEB_UI_LOCATION }}">GeoServer</a></li>
+                    {% endif %}
+                    {% if USE_MONITORING %}
+                    <li role="separator" class="divider"></li>
+                    <li><a href="{% url "monitoring:index" %}">{% trans "Monitoring & Analytics" %}</a></li>
+                    {% endif %}
+                {% endif %}
+                <li role="separator" class="divider"></li>
+                <li><a href="{% url "help" %}">{% trans "Help" %}</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{{SITEURL}}account/logout/">{% trans "Log out" %}</a></li>
+                </ul>
+              </li>
+          {% else %}
+          <li><a href="#" data-toggle="modal" data-target="#SigninModal" role="button" >{% trans "Sign in" %} </a></li>
+              {% endif %}
+            </ul>
+          </div> <!--/.nav-collapse -->
+        </div>
+      </nav>
+
+      {% endblock header %}
+      <!-- End of Navbar -->
 {% block footer%}
 <footer class="footer custom-footer">
       <div class="container">
