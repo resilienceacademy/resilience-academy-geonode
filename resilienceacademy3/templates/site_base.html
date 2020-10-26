@@ -2,6 +2,7 @@
 {% load i18n avatar_tags %}
 {% block extra_head %}
       <link href="{{ STATIC_URL }}css/site_base.css" rel="stylesheet"/>
+      <link href="{{ STATIC_URL }}/img/favicon.ico " rel="shortcut icon" />
 {% endblock %}
 {% block extra_tab %}
 {% comment %}
@@ -117,11 +118,36 @@ Add Tab for Third Party Apps
 			<a href="https://resilienceacademy.ac.tz/" target="_blank">Resilience Academy Website</a>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 footer-text">
+                        <br><br><br><br>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 footer-text">
+                        This website is licensed under<br>
+                        <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt' target='_blank'>GNU General Public License (GPL) version 2.0</a>
+                    </div>
+                </div>
+
             </div>
             <div class="col-sm-4 col-md-4">
                 <div class="row ">
                     <div class="col-sm-12 col-md-12 footer-text text-info-left">
-                        Powered by <a href="/crd-team">CRD Team</a>
+                        Managed and Designed by <a href="/crd-team">CRD Team</a>
+                    </div>
+                </div>
+                <div class="row ">
+                    <div class="col-sm-12 col-md-12 footer-text text-info-left">
+                        <a href="#">Documents</a>|<a href='#'>User Manual</a>
+                    </div>
+                </div>
+                <div class="row ">
+                    <div class="col-sm-12 col-md-12 footer-text text-info-left">
+                        Powered by <br>Geonode <em>{% trans "version" %} {{ VERSION }}</em><br>
+                        <a href='#'>Developers</a>|<a href='#'>About</a>
                     </div>
                 </div>
             </div>
