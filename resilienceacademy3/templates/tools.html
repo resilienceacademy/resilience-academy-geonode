@@ -1,0 +1,156 @@
+{% extends "geonode_base.html" %}
+
+{% load i18n %}
+{% block title %} {% trans "Tools Page" %} — {{ block.super }} {% endblock %}
+
+{% block body_outer %}
+<div class="page-header">
+  <h2>{% trans "CLIMATE RISK DATABASE TOOLS" %}</h2>
+</div>
+<!--<p class="lead">{% trans "About GeoNode." %}</p>-->
+
+ <section class="">
+        
+          <div class="row">
+              <div class="col-md-4">
+                <h4>Basic statistics for fields tool</h4>
+                <p>Basic statistics for fields is probably the most useful tool to quickly get an overview of the features 
+                and statistics of vector datasets’ fields. With this tool, the fields’ basic statistics as well as number of 
+                empty cells and number of unique values can quickly be printed. Note: see also tool “Show statistical summary”.</p>
+
+<h5>Software: QGIS</h5>
+<h5>Tool: <a href='https://geonode.resilienceacademy.ac.tz/documents/140' target='_blank'>Tool: Basic Statistics for Fields, QGIS</a></h5>
+             </div>
+             <div class="col-md-4">
+                <h4 class="">DB Manager tool</h4>
+                <p>
+                DB Manager is a handy table management tool. In context of vector quality control, 
+                DB Manager can be used to check attribute table fields for duplicate values. 
+                Using DB Manager requires preparations, which are explained in the instructive document.
+                </p>
+               <h5>Software: QGIS</h5>
+              <h5>Tool: <a href='https://geonode.resilienceacademy.ac.tz/documents/142' target='_blank'>DB Manager – duplicate values in vector layers, QGIS</a></h5>
+              </div>
+           <div class="col-md-4">
+              <h4 class="">Error matrix tool</h4>
+              <p>
+              In the context of quality control, error matrices are created when evaluating e.g. positional accuracy of vector objects by comparing the evaluated dataset to a reference data. As a result, error matrix gives an overall quality percentage of the accuracy.
+              </p>
+            <h5>Software: Excel</h5>
+          </div>
+         
+          </div>
+
+        <div class="row">
+              <div class="col-md-4">
+                <h4>List unique values</h4>
+                <p>
+                List unique values -tool gives the opportunity to examine all possible values stored in one attribute. With this tool, it is easy to check whether an attribute has all categories given in attribute metadata, or if there are categories with multiple different ways of writing (e.g. “Pine” and “pine”)
+                </p>
+                <h5>Software: QGIS</h5>
+                <h5>Tool:<a href='https://geonode.resilienceacademy.ac.tz/documents/166' target='_blank'>List Unique Values, QGIS</a></h5>
+              </div>
+
+               <div class="col-md-4">
+                <h4>Group stats</h4>
+                <p>
+                Group stats is a tool to quickly calculate statistics for classes or groups of vector dataset’s attributes. The tool provides basic statistics of, for example, minimum and maximum, sum, average or count of values in groups.
+                </p>
+                <h5>
+                Software: QGIS, plugin
+                </h5>
+              </div>
+
+               <div class="col-md-4">
+              <h4>Raster layer statistics</h4>
+              <p>
+              This tool quickly and easily computes the basic statistics for raster layers, including minimum and maximum values, range and standard deviation. 
+              </p>
+              <h5>Software: QGIS</h5>
+              </div>
+        </div>
+
+
+
+         <div class="row">
+              <div class="col-md-4">
+                <h4>Sample raster values</h4>
+                <p>
+                In context of quality control, raster values needs to be sampled when calculating the error rate of positional accuracy of cell values. Usage of this tool requires preparing, which is instructed in the document as well. 
+                </p>
+                <h5>Software: QGIS</h5>
+                {% comment %} <h5>Tool:<a href='https://geonode.resilienceacademy.ac.tz/documents/166'>List Unique Values, QGIS</a></h5> {% endcomment %}
+              </div>
+
+               <div class="col-md-4">
+                <h4>Random selection</h4>
+                <p>
+                Random selection is a tool for vector datasets. With this tool, one can randomly select a fixed number or percentage of the vector objects. In the context of quality control, this tool helps the process of evaluating for example the positional accuracy of objects. In a large dataset, manually checking all objects is not reasonable, and through random selection the rate of error can more easily and especially reliably be evaluated.
+                </p>
+                <h5>
+                Software: QGIS, plugin
+                </h5>
+                <h5>Tool:<a href='https://geonode.resilienceacademy.ac.tz/documents/155' target='_blank'>Random selection, QGIS</a></h5>
+              </div>
+
+               <div class="col-md-4">
+              <h4>Symbology and Transparency</h4>
+              <p>
+               In context of checking “No Data” values in raster layers, the Transparency and Symbology tabs are a useful tool. In addition to absolute count of “No Data” pixels, Symbology and Transparency helps to visually examine of where the “No Data” pixels are located in the layer: are they around the area of interest as they should be if the area of interest is not a square, or can individual pixels be found from the middle of the study area?
+              </p>
+              <h5>Software: QGIS</h5>
+              </div>
+        </div>
+
+
+         <div class="row">
+              <div class="col-md-4">
+                <h4>DB Manager</h4>
+                <p>
+                DB Manager is popular tool for table managing and when working with SQL queries. Thus, it is useful to know basic skills of using DB Manager in QGIS. In the instructions, preparations for using DB Manager are explained, and links to other useful instructions are attached.
+                </p>
+                <h5>Software: QGIS</h5>
+                {% comment %} <h5>Tool:<a href='https://geonode.resilienceacademy.ac.tz/documents/166'>List Unique Values, QGIS</a></h5> {% endcomment %}
+              </div>
+
+               <div class="col-md-4">
+                <h4>Raster layer unique values</h4>
+                <p>
+                This tool quickly calculates the number of “No Data” pixels in a raster layer. This tool is useful in the process of checking raster layers for “No Data” values and should be used together with visual examination. See also tool “Symbology and Transparency”
+                </p>
+                <h5>
+                Software: QGIS, plugin
+                </h5>
+              </div>
+
+               <div class="col-md-4">
+              <h4>Show statistical summary</h4>
+              <p>
+              This is a very quick tool to draw a few statistical parameters for vector dataset’s fields. This tool shows the count, number of missing and unique values, and minimum and maximum of a field, all without opening any separate tools. Note: see also tool “Basic statistics for fields”. 
+              </p>
+              <h5>Software: QGIS</h5>
+              <h5>Tool: <a href='https://geonode.resilienceacademy.ac.tz/documents/166' target='_blank'>Show Statistical Summary, QGIS</a></h5>
+              </div>
+        </div>
+
+         <div class="row">
+              <div class="col-md-4">
+              </div>
+
+               <div class="col-md-4">
+                <h4>Topology checker</h4>
+                <p>
+                Topology checker is a handy tool to check connectivity of vector layer’s topology. The tool checks, for example, whether vector lines are connected to each other or if polygons overlap each other. Different rules can be chosen according to the case, and a number of errors are given as a result. A good-quality vector dataset has a complete topology.
+                </p>
+                <h5>
+                Software: QGIS, plugin
+                </h5>
+              </div>
+
+               <div class="col-md-4">
+              </div>
+        </div>
+
+      </section>
+
+{% endblock %}
