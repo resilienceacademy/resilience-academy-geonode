@@ -54,4 +54,7 @@ urlpatterns = [
     url(r'^crd-team/$',
         TemplateView.as_view(template_name='crd_team.html'),
         name='crd-team'),
+    url(r'^tools-page/$',
+        TemplateView.as_view(template_name='tools.html'),
+        name='tools-page'),
  ] + urlpatterns
