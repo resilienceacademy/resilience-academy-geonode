@@ -4,14 +4,19 @@
 {% block title %} {% trans "Tools Page" %} — {{ block.super }} {% endblock %}
 
 {% block body_outer %}
-<div class="page-header">
+{% comment %} <div class="page-header">
   <h2>{% trans "CLIMATE RISK DATABASE TOOLS" %}</h2>
-</div>
+</div> {% endcomment %}
 <!--<p class="lead">{% trans "About GeoNode." %}</p>-->
-
+{% comment %} <section class="custom-tools"> {% endcomment %}
  <section class="">
-        
-          <div class="row">
+          <div style="background-image: url('../static/img/tools.png');
+          background-size: cover; height:280px; padding-top:5px;">
+          </div>
+           <div class="page-header">
+  <h2 class="heading-tools">{% trans "CRD Tools" %}</h2>
+</div>
+          <div class="row" style="padding:10px;">
               <div class="col-md-4">
                 <h4>Basic statistics for fields tool</h4>
                 <p>Basic statistics for fields is probably the most useful tool to quickly get an overview of the features 
@@ -41,7 +46,7 @@
          
           </div>
 
-        <div class="row">
+        <div class="row" style="padding:10px;">
               <div class="col-md-4">
                 <h4>List unique values</h4>
                 <p>
@@ -72,7 +77,7 @@
 
 
 
-         <div class="row">
+         <div class="row" style="padding:10px;">
               <div class="col-md-4">
                 <h4>Sample raster values</h4>
                 <p>
@@ -103,7 +108,7 @@
         </div>
 
 
-         <div class="row">
+         <div class="row" style="padding:10px;">
               <div class="col-md-4">
                 <h4>DB Manager</h4>
                 <p>
@@ -133,7 +138,7 @@
               </div>
         </div>
 
-         <div class="row">
+         <div class="row" style="padding:10px;">
               <div class="col-md-4">
               </div>
 
