@@ -95,11 +95,11 @@
     </dd>
     {% endif %}
 
-    {% if resource.owner %}
+    {% comment %} {% if resource.owner %}
     <dt>{% trans "Owner" %}</dt>
     <!-- <dd><a itemprop="author" href="{{ resource.owner.get_absolute_url }}">Resilience Academy</a></dd> -->
     <dd><a itemprop="author" href="#">Resilience Academy</a></dd>
-    {% endif %}
+    {% endif %} {% endcomment %}
 
     {% if resource.poc.user %}
     <dt>{% trans "Point of Contact" %}</dt>
