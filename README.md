@@ -98,7 +98,7 @@ GeoNode-Project Template for `resilienceacademy`
 
     ```bash
     cd /opt/resilienceacademy3
-    ./docker-build-sh
+    ./docker-build.sh
     ```
 
 3. Follow the logs in order to be sure the container started up correctly.
