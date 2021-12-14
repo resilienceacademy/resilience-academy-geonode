@@ -236,3 +236,8 @@ body.home div#wrap section#showcase a {
     width: 120px;
     height: 120px;
 }
+
+.item-container
+{
+    padding: 1em;
+}
