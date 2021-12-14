@@ -239,7 +239,8 @@ body.home div#wrap section#showcase a {
 
 .item-container
 {
-    padding: 1em;
+    padding-bottom: 1em;
+    padding-right: 1em;
 }
 
 /* .item-details
