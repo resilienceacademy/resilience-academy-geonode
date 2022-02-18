@@ -1,3 +1,5 @@
+# Resilience Academy documentation
+
 # Resilienceacademy
 
 ## Table of Contents
