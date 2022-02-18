@@ -1,4 +1,5 @@
 # Resilience Academy documentation
+This is a documentation on how to install our Climate Risk Database (CRD) to your own servers. This documentation is based on the step by step procedures which was used to create Resilience Academy 
 
 # Resilienceacademy
 
