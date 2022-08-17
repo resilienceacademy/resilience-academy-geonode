@@ -18,7 +18,6 @@ ProjectSend is licensed under [CC BY 4.0](https://creativecommons.org/licenses/b
 ## Contact us
 
 If you would like to contact us, send an email throught: resilienceacademytz@gmail.com
->>>>>>> b708934110ebd67c9df01454a15e79ba0bec7523
 
 
 ## Table of Contents
