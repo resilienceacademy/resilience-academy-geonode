@@ -3,8 +3,6 @@
 [![Twitter follow:](https://img.shields.io/twitter/url?url=https%3A%2F%2Ftwitter.com%2FTanzania_RA)](https://twitter.com/Tanzania_RA)
 
 # Resilience Academy documentation
-This is a documentation on how to install our Climate Risk Database (CRD) to your own servers. This documentation is based on the step by step procedures which was used to create Resilience Academy 
-=======
 This is a documentation on how to install our `Climate Risk Database (CRD)` to your own servers. This documentation is based on the step by step procedures which was used to create the `CRD`  
 
 The `CRD` is one of the Resilience Academy service that was established to facilitate access of spatial and non spatial data from the Resilience Academy innitiatives. The data in the `CRD` involves the geospatial data (vector data and raster data) and the reports that have been produced from the Tanzania Urban Resilience Progra (TURP). More information about TURP can be accessed [here](worldbank.org/en/programs/tanzania-urban-resilience-program)
